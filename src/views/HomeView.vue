@@ -58,13 +58,11 @@
             </el-icon>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item>View</el-dropdown-item>
-                <el-dropdown-item>Add</el-dropdown-item>
-                <el-dropdown-item>Delete</el-dropdown-item>
+                <el-dropdown-item @click="logout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
-          <span>Tom</span>
+          <span>{{state.suName}}</span>
         </div>
       </el-header>
 
@@ -87,10 +85,14 @@
 import { Menu as IconMenu, Message, Setting, Avatar } from "@element-plus/icons-vue";
 import { reactive, onMounted } from "vue";
 import axios from "axios";
+import {useRouter} from 'vue-router'
+
+const router = useRouter()
 
 // 定义页面的数据变量对象state
 const state = reactive({
   tableData: [],
+  suName: ''
 });
 
 // 获取后台数据的方法定义
@@ -103,8 +105,24 @@ const getData = () => {
   });
 };
 
+// 退出登录的方法
+const logout = () => {
+  // 清除本地保存的登录信息
+  localStorage.clear()
+  // 跳转到登录页面
+  router.push('/login')
+}
+
+
 // 页面初始化之后会执行这个方法
 onMounted(() => {
+  const suName = localStorage.getItem('suName')
+  if(suName){
+    state.suName = suName
+  }else{
+    router.push('/login')
+  }
+
   // 初始化表格数据
   getData();
 });
