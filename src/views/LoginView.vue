@@ -3,7 +3,7 @@
   <div class="login-container">
     <el-card class="login-box">
       <h2 class="login-title">客户关系管理系统</h2>
-      <el-form :model="formData">
+      <el-form :model="formData" ref="ruleFormRef">
         <el-form-item>
           <el-input
             v-model="formData.suName"
@@ -29,9 +29,9 @@
               placeholder="请输入验证码"
               class="captcha-input"
             />
-            <div class="captcha-image">
+            <div class="captcha-image" @click="refreshCaptcha">
               <!-- 验证码占位图 -->
-              <span>1234</span>
+              <span>{{formData}}</span>
             </div>
           </div>
         </el-form-item>
@@ -47,19 +47,22 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from "vue";
+import { reactive ,onMounted,ref } from "vue";
 import { ElMessage } from "element-plus";
 import axios from "axios";
 import {useRouter} from 'vue-router';
 
+const captchaText = ref(''); 
 // 创建路由器对象
 const router = useRouter()
+
 
 
 const formData = reactive({
   suName: "",
   suPwd: "",
   captcha: "",
+  code: "",
 });
 
 // 登录方法
@@ -81,6 +84,22 @@ const login = () => {
     }
   });
 };
+
+const refreshCaptcha = () => {
+  // 生成4位随机验证码
+  const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let result = '';
+  for (let i = 0; i < 4; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  captchaText.value = result;
+};
+
+onMounted(() => {
+  // 初始化验证码
+  refreshCaptcha();
+});
+
 </script>
 
 <style scoped>

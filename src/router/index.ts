@@ -7,7 +7,24 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView
+      component: HomeView,
+      children: [
+        {
+          path: '/user',
+          name: 'user',
+          component: () => import('../views/UserView.vue')
+        },
+        {
+          path: '/customer',
+          name: 'customer',
+          component: () => import('../views/CustomerView.vue')
+        },
+        {
+          path: '/sales',
+          name: 'sales',
+          component: () => import('../views/SalesView.vue')
+        }
+      ]
     },
     {
       path: '/login',

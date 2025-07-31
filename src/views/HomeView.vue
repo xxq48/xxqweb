@@ -2,14 +2,15 @@
   <el-container class="layout-container-demo" style="height: 100vh">
     <el-aside width="200px">
       <el-scrollbar>
-        <el-menu :default-openeds="['1', '3']">
+        <el-menu :default-openeds="['1', '3']" router>
           <el-sub-menu index="1">
             <template #title>
               <el-icon><message /></el-icon>销售模块
             </template>
-            <el-menu-item index="1-1"><el-icon><Avatar /></el-icon>用户管理</el-menu-item>
-            <el-menu-item index="1-2">客户管理</el-menu-item>
-            <el-menu-item index="1-3">销售管理</el-menu-item>
+            <!-- index属性的值是路由表里面的path -->
+            <el-menu-item index="user"><el-icon><Avatar /></el-icon>用户管理</el-menu-item>
+            <el-menu-item index="customer">客户管理</el-menu-item>
+            <el-menu-item index="sales">销售管理</el-menu-item>
           </el-sub-menu>
           <el-sub-menu index="2">
             <template #title>
@@ -68,13 +69,14 @@
 
       <el-main>
         <el-scrollbar>
-          <el-table :data="state.tableData">
+          <router-view></router-view>
+          <!-- <el-table :data="state.tableData">
             <el-table-column prop="suId" label="编号" width="140" />
             <el-table-column prop="suName" label="名称" width="120" />
             <el-table-column prop="suPwd" label="密码" width="120" />
             <el-table-column prop="suRole" label="角色" width="120" />
             <el-table-column prop="suTime" label="时间" width="120" />
-          </el-table>
+          </el-table> -->
         </el-scrollbar>
       </el-main>
     </el-container>
