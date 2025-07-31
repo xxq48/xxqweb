@@ -31,7 +31,7 @@
             />
             <div class="captcha-image" @click="refreshCaptcha">
               <!-- 验证码占位图 -->
-              <span>{{formData}}</span>
+              <span>{{formData.code}}</span>
             </div>
           </div>
         </el-form-item>
@@ -92,7 +92,7 @@ const refreshCaptcha = () => {
   for (let i = 0; i < 4; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
-  captchaText.value = result;
+  formData.code = result;
 };
 
 onMounted(() => {
