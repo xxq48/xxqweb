@@ -2,7 +2,7 @@
 <template>
   <div class="login-container">
     <el-card class="login-box">
-      <h2 class="login-title">客户关系管理系统</h2>
+      <h2 class="login-title">国际教育企业官网</h2>
       <el-form :model="formData" ref="ruleFormRef">
         <el-form-item>
           <el-input
