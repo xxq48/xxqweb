@@ -8,9 +8,14 @@ export default defineConfig({
   plugins: [
     vue(),
   ],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+   server: {
+    proxy: {
+      // 配置接口代理
+      '/api': {
+        target: 'http://localhost:8080', // 后端服务地址
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '') 
+      }
     }
   }
 })

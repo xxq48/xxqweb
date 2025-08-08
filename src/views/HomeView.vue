@@ -2,81 +2,104 @@
   <el-container class="layout-container-demo" style="height: 100vh">
     <el-aside width="200px">
       <el-scrollbar>
-        <el-menu :default-openeds="['1', '3']" router>
+        <el-menu :default-openeds="['1', '4']" router>
+          <!-- 系统管理模块 -->
           <el-sub-menu index="1">
             <template #title>
-              <el-icon><message /></el-icon>销售模块
+              <el-icon><User /></el-icon>系统管理
             </template>
-            <!-- index属性的值是路由表里面的path -->
-            <el-menu-item index="user"><el-icon><Avatar /></el-icon>用户管理</el-menu-item>
-            <el-menu-item index="customer">客户管理</el-menu-item>
-            <el-menu-item index="sales">销售管理</el-menu-item>
+            <el-menu-item index="/user"><el-icon><Avatar /></el-icon>用户管理</el-menu-item>
+            <el-menu-item index="/role"><el-icon><Key /></el-icon>角色管理</el-menu-item>
           </el-sub-menu>
+          
+          <!-- 咨询管理模块 -->
           <el-sub-menu index="2">
             <template #title>
-              <el-icon><icon-menu /></el-icon>Navigator Two
+              <el-icon><Message /></el-icon>咨询管理
             </template>
-            <el-menu-item-group>
-              <template #title>Group 1</template>
-              <el-menu-item index="2-1">Option 1</el-menu-item>
-              <el-menu-item index="2-2">Option 2</el-menu-item>
-            </el-menu-item-group>
-            <el-menu-item-group title="Group 2">
-              <el-menu-item index="2-3">Option 3</el-menu-item>
-            </el-menu-item-group>
-            <el-sub-menu index="2-4">
-              <template #title>Option 4</template>
-              <el-menu-item index="2-4-1">Option 4-1</el-menu-item>
-            </el-sub-menu>
+            <el-menu-item index="consultation"><el-icon><ChatDotRound /></el-icon>咨询记录</el-menu-item>
+            <el-menu-item index="reply"><el-icon><Check/></el-icon>回复管理</el-menu-item>
           </el-sub-menu>
+          
+          <!-- 课程管理模块 -->
           <el-sub-menu index="3">
+  <template #title>
+    <el-icon><Reading /></el-icon>课程管理 
+  </template>
+            <el-menu-item index="course"><el-icon><Document /></el-icon>课程列表</el-menu-item>
+            <el-menu-item index="teacher"><el-icon><UserFilled /></el-icon>教师管理</el-menu-item>
+          </el-sub-menu>
+          
+          <!-- 资讯管理模块 -->
+          <el-sub-menu index="4">
             <template #title>
-              <el-icon><setting /></el-icon>Navigator Three
-            </template>
-            <el-menu-item-group>
-              <template #title>Group 1</template>
-              <el-menu-item index="3-1">Option 1</el-menu-item>
-              <el-menu-item index="3-2">Option 2</el-menu-item>
-            </el-menu-item-group>
-            <el-menu-item-group title="Group 2">
-              <el-menu-item index="3-3">Option 3</el-menu-item>
-            </el-menu-item-group>
-            <el-sub-menu index="3-4">
-              <template #title>Option 4</template>
-              <el-menu-item index="3-4-1">Option 4-1</el-menu-item>
-            </el-sub-menu>
+  <el-icon><MessageBox /></el-icon>资讯管理
+</template>
+            <el-menu-item index="news"><el-icon><Reading /></el-icon>资讯列表</el-menu-item>
+           <el-menu-item index="statistics"><el-icon><Histogram/></el-icon>浏览统计</el-menu-item>
           </el-sub-menu>
         </el-menu>
       </el-scrollbar>
     </el-aside>
-
+    
     <el-container>
       <el-header style="text-align: right; font-size: 12px">
         <div class="toolbar">
           <el-dropdown>
             <el-icon style="margin-right: 8px; margin-top: 1px">
-              <setting />
+              <Setting />
             </el-icon>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item @click="logout">退出登录</el-dropdown-item>
+                <el-dropdown-item @click="goProfile">个人中心</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
-          <span>{{state.suName}}</span>
+          <span>{{ state.suName }}</span>
         </div>
       </el-header>
-
+      
       <el-main>
         <el-scrollbar>
-          <router-view></router-view>
-          <!-- <el-table :data="state.tableData">
-            <el-table-column prop="suId" label="编号" width="140" />
-            <el-table-column prop="suName" label="名称" width="120" />
-            <el-table-column prop="suPwd" label="密码" width="120" />
-            <el-table-column prop="suRole" label="角色" width="120" />
-            <el-table-column prop="suTime" label="时间" width="120" />
-          </el-table> -->
+          <router-view />
+          
+          <!-- 默认展示课程数据表格 -->
+          <div v-if="$route.path === '/'">
+            <el-card>
+              <template #header>
+                <div class="card-header">
+                  <span>热门课程列表</span>
+                  <el-button type="primary" size="small" @click="refreshData">刷新数据</el-button>
+                </div>
+              </template>
+              
+              <el-table :data="state.courseData" border style="width: 100%">
+                <el-table-column prop="id" label="课程ID" width="80" />
+                <el-table-column prop="title" label="课程名称" width="200" />
+              <el-table-column prop="price" label="价格" width="100">
+  <template #default="scope">{{ formatPrice(scope.row.price) }}</template>
+</el-table-column>
+                <el-table-column prop="duration" label="时长(月)" width="100" />
+                <el-table-column prop="level" label="难度级别" width="120">
+                  <template #default="scope">
+                    <el-tag :type="getLevelTagType(scope.row.level)">
+                      {{ scope.row.level === 1 ? '入门' : 
+                        scope.row.level === 2 ? '基础' : 
+                        scope.row.level === 3 ? '进阶' : '高级' }}
+                    </el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="time" label="创建时间" width="160" />
+                <el-table-column label="操作" width="180">
+                  <template #default="scope">
+                    <el-button size="small" @click="viewCourseDetail(scope.row.id)">查看详情</el-button>
+                    <el-button size="small" type="primary" @click="editCourse(scope.row.id)">编辑</el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </el-card>
+          </div>
         </el-scrollbar>
       </el-main>
     </el-container>
@@ -84,78 +107,133 @@
 </template>
 
 <script lang="ts" setup>
-import { Menu as IconMenu, Message, Setting, Avatar } from "@element-plus/icons-vue";
+import { 
+  User, Message, Reading, 
+  MessageBox, Avatar, Key, ChatDotRound, Check,  
+  Document, UserFilled, Histogram,  
+  Setting, Refresh, ArrowRight
+} from "@element-plus/icons-vue";
 import { reactive, onMounted } from "vue";
+import { useRouter } from 'vue-router';
 import axios from "axios";
-import {useRouter} from 'vue-router'
+import { ElMessage } from 'element-plus';
 
-const router = useRouter()
+const router = useRouter();
 
-// 定义页面的数据变量对象state
+// 状态管理
 const state = reactive({
-  tableData: [],
-  suName: ''
+  suName: '',
+  courseData: [],
+  loading: false
 });
 
-// 获取后台数据的方法定义
-const getData = () => {
-  axios({
-    method: "get",
-    url: "http://localhost:8080/sysUser/listUser"
-  }).then((res) => {
-    state.tableData = res.data;
+// 格式化价格过滤器
+const formatPrice = (value: number) => {
+  return `¥${value.toFixed(2)}`;
+};
+
+// 获取难度级别标签样式
+const getLevelTagType = (level: number) => {
+  const types = ['', 'success', 'info', 'warning', 'danger'];
+  return types[level] || 'default';
+};
+
+// 刷新数据
+const refreshData = () => {
+  state.loading = true;
+  fetchCourseData().then(() => {
+    state.loading = false;
+    ElMessage.success('数据刷新成功');
   });
 };
 
-// 退出登录的方法
+// 获取课程数据
+const fetchCourseData = () => {
+  return axios.get('http://localhost:8080/course/list')
+    .then(res => {
+      // 转换价格为数字类型
+      state.courseData = res.data.map((course: any) => ({
+        ...course,
+        price: Number(course.price)
+      }));
+      return state.courseData;
+    })
+    .catch(err => {
+      console.error('获取课程数据失败:', err);
+      ElMessage.error('获取课程数据失败');
+      return [];
+    });
+};
+
+// 查看课程详情
+const viewCourseDetail = (id: number) => {
+  router.push(`/course/detail/${id}`);
+};
+
+// 编辑课程
+const editCourse = (id: number) => {
+  router.push(`/course/edit/${id}`);
+};
+
+// 个人中心
+const goProfile = () => {
+  router.push('/profile');
+};
+
+// 退出登录
 const logout = () => {
-  // 清除本地保存的登录信息
-  localStorage.clear()
-  // 跳转到登录页面
-  router.push('/login')
-}
+  localStorage.clear();
+  router.push('/login');
+  ElMessage.success('已退出登录');
+};
 
-
-// 页面初始化之后会执行这个方法
+// 页面初始化
 onMounted(() => {
-  const suName = localStorage.getItem('suName')
-  if(suName){
-    state.suName = suName
-  }else{
-    router.push('/login')
+  // 验证登录状态
+  const suName = localStorage.getItem('suName');
+  if (suName) {
+    state.suName = suName;
+    fetchCourseData(); // 加载课程数据
+  } else {
+    router.push('/login');
   }
-
-  // 初始化表格数据
-  getData();
 });
 </script>
 
-
 <style scoped>
 .layout-container-demo .el-header {
-  position: relative;
   background-color: var(--el-color-primary-light-7);
   color: var(--el-text-color-primary);
+  padding: 0 20px;
 }
-.layout-container-demo .el-aside,
-.el-menu,
-.el-sub-menu,
-.el-menu-item,
-.el-menu-item-group {
-  color: var(--el-text-color-primary);
+
+.layout-container-demo .el-aside {
   background: var(--el-color-primary-light-8);
+  border-right: 1px solid var(--el-border-color);
 }
-.layout-container-demo .el-menu {
+
+.el-menu {
   border-right: none;
 }
-.layout-container-demo .el-main {
-  padding: 0;
-}
-.layout-container-demo .toolbar {
-  display: inline-flex;
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
+}
+
+.toolbar {
   height: 100%;
-  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.el-main {
+  padding: 15px;
+}
+
+.el-table {
+  margin-top: 15px;
 }
 </style>
