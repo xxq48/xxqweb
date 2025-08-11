@@ -8,12 +8,12 @@
   <el-button type="primary" :icon="Plus" @click="handleAdd">新增</el-button>
   
   <el-table :data="state.tableData" border stripe style="width: 100%; margin-top: 20px;">
-    <el-table-column fixed prop="suId" label="编号" width="100" />
-    <el-table-column prop="suName" label="用户名" width="120" />
-    <el-table-column prop="suEmail" label="邮箱" width="200" />
-    <el-table-column prop="suPhone" label="手机号" width="150" />
-    <el-table-column prop="suRole" label="角色" width="150" />
-    <el-table-column prop="suCreateTime" label="创建时间" width="200" />
+    <el-table-column fixed prop="id" label="编号" width="100" />
+    <el-table-column prop="name" label="用户名" width="120" />
+    <el-table-column prop="email" label="邮箱" width="200" />
+    <el-table-column prop="phone" label="手机号" width="150" />
+    <el-table-column prop="role" label="角色" width="150" />
+    <el-table-column prop="time" label="创建时间" width="200" />
     <el-table-column fixed="right" label="操作" min-width="120">
       <template #default="scope">
         <el-button link type="primary" size="small" @click="handleDelete(scope.row)">
@@ -41,20 +41,20 @@
   <!-- 编辑窗口 -->
   <el-dialog v-model="state.dialogFormVisible" title="修改用户信息" width="500">
     <el-form :model="state.form" ref="editFormRef" :rules="editRules">
-      <el-form-item label="编号" :label-width="state.formLabelWidth" prop="suId">
-        <el-input v-model="state.form.suId" autocomplete="off" readonly />
+      <el-form-item label="编号" :label-width="state.formLabelWidth" prop="id">
+        <el-input v-model="state.form.id" autocomplete="off" readonly />
       </el-form-item>
-      <el-form-item label="用户名" :label-width="state.formLabelWidth" prop="suName">
-        <el-input v-model="state.form.suName" autocomplete="off" />
+      <el-form-item label="用户名" :label-width="state.formLabelWidth" prop="name">
+        <el-input v-model="state.form.name" autocomplete="off" />
       </el-form-item>
-      <el-form-item label="邮箱" :label-width="state.formLabelWidth" prop="suEmail">
-        <el-input v-model="state.form.suEmail" autocomplete="off" />
+      <el-form-item label="邮箱" :label-width="state.formLabelWidth" prop="email">
+        <el-input v-model="state.form.email" autocomplete="off" />
       </el-form-item>
-      <el-form-item label="手机号" :label-width="state.formLabelWidth" prop="suPhone">
-        <el-input v-model="state.form.suPhone" autocomplete="off" />
+      <el-form-item label="手机号" :label-width="state.formLabelWidth" prop="phone">
+        <el-input v-model="state.form.phone" autocomplete="off" />
       </el-form-item>
-      <el-form-item label="角色" :label-width="state.formLabelWidth" prop="suRole">
-        <el-select v-model="state.form.suRole" placeholder="请选择角色">
+      <el-form-item label="角色" :label-width="state.formLabelWidth" prop="role">
+        <el-select v-model="state.form.role" placeholder="请选择角色">
           <el-option label="超级管理员" value="ROLE_SUPER_ADMIN" />
           <el-option label="内容运营" value="ROLE_CONTENT_OP" />
           <el-option label="留学顾问" value="ROLE_CONSULTANT" />
@@ -64,7 +64,7 @@
       </el-form-item>
       <el-form-item label="创建时间" :label-width="state.formLabelWidth" prop="suCreateTime">
         <el-date-picker
-          v-model="state.form.suCreateTime"
+          v-model="state.form.createTime"
           type="datetime"
           value-format="YYYY-MM-DD HH:mm:ss"
           placeholder="请选择日期时间"
@@ -83,20 +83,20 @@
   <!-- 新增窗口 -->
   <el-dialog v-model="state.dialogAddFormVisible" title="新增用户信息" width="500">
     <el-form :model="state.Addform" ref="addFormRef" :rules="addRules">
-      <el-form-item label="用户名" :label-width="state.formLabelWidth" prop="suName">
-        <el-input v-model="state.Addform.suName" autocomplete="off" />
+      <el-form-item label="用户名" :label-width="state.formLabelWidth" prop="name">
+        <el-input v-model="state.Addform.name" autocomplete="off" />
       </el-form-item>
-      <el-form-item label="密码" :label-width="state.formLabelWidth" prop="suPwd">
-        <el-input v-model="state.Addform.suPwd" autocomplete="off" show-password />
+      <el-form-item label="密码" :label-width="state.formLabelWidth" prop="pwd">
+        <el-input v-model="state.Addform.pwd" autocomplete="off" show-password />
       </el-form-item>
-      <el-form-item label="邮箱" :label-width="state.formLabelWidth" prop="suEmail">
-        <el-input v-model="state.Addform.suEmail" autocomplete="off" />
+      <el-form-item label="邮箱" :label-width="state.formLabelWidth" prop="email">
+        <el-input v-model="state.Addform.email" autocomplete="off" />
       </el-form-item>
-      <el-form-item label="手机号" :label-width="state.formLabelWidth" prop="suPhone">
-        <el-input v-model="state.Addform.suPhone" autocomplete="off" />
+      <el-form-item label="手机号" :label-width="state.formLabelWidth" prop="phone">
+        <el-input v-model="state.Addform.phone" autocomplete="off" />
       </el-form-item>
-      <el-form-item label="角色" :label-width="state.formLabelWidth" prop="suRole">
-        <el-select v-model="state.Addform.suRole" placeholder="请选择角色">
+      <el-form-item label="角色" :label-width="state.formLabelWidth" prop="role">
+        <el-select v-model="state.Addform.role" placeholder="请选择角色">
           <el-option label="超级管理员" value="ROLE_SUPER_ADMIN" />
           <el-option label="内容运营" value="ROLE_CONTENT_OP" />
           <el-option label="留学顾问" value="ROLE_CONSULTANT" />
@@ -106,7 +106,7 @@
       </el-form-item>
       <el-form-item label="创建时间" :label-width="state.formLabelWidth" prop="suCreateTime">
         <el-date-picker
-          v-model="state.Addform.suCreateTime"
+          v-model="state.Addform.createTime"
           type="datetime"
           value-format="YYYY-MM-DD HH:mm:ss"
           placeholder="请选择日期时间"
@@ -130,15 +130,24 @@ import axios from "axios";
 import type { FormInstance, FormRules } from "element-plus";
 import { Plus, ArrowRight } from "@element-plus/icons-vue";
 
+// 新增角色映射对象，建立编码与中文名称的对应关系
+const roleMap = {
+  'ROLE_SUPER_ADMIN': '超级管理员',
+  'ROLE_CONTENT_OP': '内容运营',
+  'ROLE_CONSULTANT': '留学顾问',
+  'ROLE_TEACHER': '教师',
+  'ROLE_USER': '普通用户'
+};
+
 // 定义用户数据类型接口（补充邮箱、手机号、角色字段）
 interface User {
-  suId: string | number;
-  suName: string;
-  suPwd: string;
-  suEmail: string;
-  suPhone: string;
-  suRole: string;
-  suCreateTime: string;
+  id: string | number;
+  name: string;
+  pwd: string;
+  email: string;
+  phone: string;
+  role: string;
+  createTime: string;
 }
 
 // 定义表单引用
@@ -155,115 +164,62 @@ const state = reactive({
   pageSize: 5, 
   total: 0,
   form: {
-    suId: "",
-    suName: "",
-    suEmail: "",
-    suPhone: "",
-    suRole: "",
-    suCreateTime: "",
+    id: "",
+    name: "",
+    email: "",
+    phone: "",
+    role: "",
+    createTime: "",
   } as User,
   Addform: {
-    suName: "",
-    suPwd: "",
-    suEmail: "",
-    suPhone: "",
-    suRole: "",
-    suCreateTime: "",
+    name: "",
+    pwd: "",
+    email: "",
+    phone: "",
+    role: "",
+    createTime: "",
   } as User,
 });
 
 // 编辑表单验证规则（补充邮箱、手机号验证）
 const editRules = reactive<FormRules<User>>({
-  suId: [
+  id: [
     { required: true, message: "编号不能为空", trigger: "blur" },
     { type: "number", message: "编号必须为数字", trigger: "blur" },
   ],
-  suName: [{ required: true, message: "用户名不能为空", trigger: "blur" }],
-  suEmail: [
+  name: [{ required: true, message: "用户名不能为空", trigger: "blur" }],
+  email: [
     { required: true, message: "邮箱不能为空", trigger: "blur" },
     { type: "email", message: "请输入正确的邮箱格式", trigger: "blur" }
   ],
-  suPhone: [
+  phone: [
     { required: true, message: "手机号不能为空", trigger: "blur" },
     { pattern: /^1[3-9]\d{9}$/, message: "请输入正确的手机号格式", trigger: "blur" }
   ],
-  suRole: [{ required: true, message: "请选择角色", trigger: "blur" }],
-  suCreateTime: [{ required: true, message: "请选择创建时间", trigger: "blur" }],
+  role: [{ required: true, message: "请选择角色", trigger: "blur" }],
+  createTime: [{ required: true, message: "请选择创建时间", trigger: "blur" }],
 });
 
 // 新增表单验证规则
 const addRules = reactive<FormRules<User>>({
-  suName: [{ required: true, message: "用户名不能为空", trigger: "blur" }],
-  suPwd: [
+  name: [{ required: true, message: "用户名不能为空", trigger: "blur" }],
+  pwd: [
     { required: true, message: "密码不能为空", trigger: "blur" },
     { min: 4, message: "密码长度不能少于4位", trigger: "blur" }
   ],
-  suEmail: [
+  email: [
     { required: true, message: "邮箱不能为空", trigger: "blur" },
     { type: "email", message: "请输入正确的邮箱格式", trigger: "blur" }
   ],
-  suPhone: [
+  phone: [
     { required: true, message: "手机号不能为空", trigger: "blur" },
     { pattern: /^1[3-9]\d{9}$/, message: "请输入正确的手机号格式", trigger: "blur" }
   ],
-  suRole: [{ required: true, message: "请选择角色", trigger: "blur" }],
-  suCreateTime: [{ required: true, message: "请选择创建时间", trigger: "blur" }],
+  role: [{ required: true, message: "请选择角色", trigger: "blur" }],
+  createTime: [{ required: true, message: "请选择创建时间", trigger: "blur" }],
 });
 
-// 初始化数据
-const initMockData = () => {
- 
-  const mockData: User[] = [
-    {
-      suId: "1",
-      suName: "刘总监",
-      suPwd: "1111",
-      suEmail: "admin@globaledu.com",
-      suPhone: "13811112222",
-      suRole: "ROLE_SUPER_ADMIN",
-      suCreateTime: "2023-01-12 10:00:00"
-    },
-    {
-      suId: "2",
-      suName: "陈编辑",
-      suPwd: "2222",
-      suEmail: "editor_chen@globaledu.com",
-      suPhone: "13922223333",
-      suRole: "ROLE_CONTENT_OP",
-      suCreateTime: "2024-01-10 11:20:00"
-    },
-    {
-      suId: "3",
-      suName: "李留学",
-      suPwd: "3333",
-      suEmail: "li_teacher@globaledu.com",
-      suPhone: "13733334444",
-      suRole: "ROLE_CONSULTANT",
-      suCreateTime: "2024-02-05 09:10:00"
-    },
-    {
-      suId: "4",
-      suName: "王家长",
-      suPwd: "4444",
-      suEmail: "wang_parent@example.com",
-      suPhone: "13644445555",
-      suRole: "ROLE_USER",
-      suCreateTime: "2024-03-20 14:30:00"
-    },
-    {
-      suId: "5",
-      suName: "张同学",
-      suPwd: "5555",
-      suEmail: "zhang_stu@school.com",
-      suPhone: "13555556666",
-      suRole: "ROLE_USER",
-      suCreateTime: "2024-04-10 16:10:00"
-    }
-  ];
-  
-  state.tableData = mockData;
-  state.total = mockData.length;
-};
+
 
 // 获取后台数据（实际项目中替换为接口请求）
 const getData = () => {
@@ -312,7 +268,7 @@ const update = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid) => {
     if (valid) {
       // 模拟接口请求，实际项目中替换为真实接口
-      const index = state.tableData.findIndex(item => item.suId === state.form.suId);
+      const index = state.tableData.findIndex(item => item.id === state.form.id);
       if (index !== -1) {
         state.tableData[index] = { ...state.form };
         state.dialogFormVisible = false;
@@ -344,7 +300,7 @@ const add = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid) => {
     if (valid) {
       // 模拟接口请求，实际项目中替换为真实接口
-      const newId = (Math.max(...state.tableData.map(item => Number(item.suId))) + 1).toString();
+      const newId = (Math.max(...state.tableData.map(item => Number(item.id))) + 1).toString();
       const newUser = {
         ...state.Addform,
         suId: newId
@@ -378,13 +334,13 @@ const handleAdd = () => {
   state.dialogAddFormVisible = true;
   // 重置表单
   state.Addform = {
-    suId: "",
-    suName: "",
-    suPwd: "",
-    suEmail: "",
-    suPhone: "",
-    suRole: "",
-    suCreateTime: ""
+    id: "",
+    name: "",
+    pwd: "",
+    email: "",
+    phone: "",
+    role: "",
+    createTime: ""
   };
 };
 
@@ -396,7 +352,7 @@ const handleDelete = (row: User) => {
     type: "warning",
   }).then(() => {
     // 模拟接口请求，实际项目中替换为真实接口
-    state.tableData = state.tableData.filter(item => item.suId !== row.suId);
+    state.tableData = state.tableData.filter(item => item.id !== row.id);
     state.total--;
     ElMessage.success("删除成功");
     
@@ -404,7 +360,7 @@ const handleDelete = (row: User) => {
     axios({
       method: "post",
       url: "http://localhost:8080/sysUser/delUser",
-      params: { suId: row.suId },
+      params: { suId: row.id },
     }).then((res) => {
       if (res.data.code === 0) {
         ElMessage.success("删除成功");

@@ -1,4 +1,0 @@
-<template>
-    
-    客户管理
-</template> 
