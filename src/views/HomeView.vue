@@ -18,7 +18,6 @@
               <el-icon><Message /></el-icon>咨询管理
             </template>
             <el-menu-item index="consultation"><el-icon><ChatDotRound /></el-icon>咨询记录</el-menu-item>
-            <el-menu-item index="reply"><el-icon><Check/></el-icon>回复管理</el-menu-item>
           </el-sub-menu>
           
           <!-- 课程管理模块 -->
@@ -116,7 +115,7 @@ import {
 import { reactive, onMounted } from "vue";
 import { useRouter } from 'vue-router';
 import axios from "axios";
-import { ElMessage } from 'element-plus';
+import { ElMessage,ElLoading } from 'element-plus';
 
 const router = useRouter();
 
@@ -149,7 +148,7 @@ const refreshData = () => {
 
 // 获取课程数据
 const fetchCourseData = () => {
-  return axios.get('http://localhost:8080/course/list')
+  return axios.get('http://localhost:8080/course/listCourse')
     .then(res => {
       // 转换价格为数字类型
       state.courseData = res.data.map((course: any) => ({
@@ -165,14 +164,62 @@ const fetchCourseData = () => {
     });
 };
 
+// 获取课程详情
+const fetchCourseDetail = (id: number) => {
+  const loading = ElLoading.service({
+    lock: true,
+    text: '加载中...',
+    background: 'rgba(0, 0, 0, 0.7)'
+  });
+  
+  return axios.get(`http://localhost:8080/course/detail/${id}`)
+    .then(res => {
+      loading.close();
+      return res.data;
+    })
+    .catch(err => {
+      loading.close();
+      console.error('获取课程详情失败:', err);
+      ElMessage.error('获取课程详情失败');
+      return null;
+    });
+};
+
 // 查看课程详情
-const viewCourseDetail = (id: number) => {
-  router.push(`/course/detail/${id}`);
+const viewCourseDetail = async (id: number) => {
+  const courseDetail = await fetchCourseDetail(id);
+  if (courseDetail) {
+    router.push({
+      path: `/course/detail/${id}`,
+      query: { course: JSON.stringify(courseDetail) }
+    });
+  }
 };
 
 // 编辑课程
-const editCourse = (id: number) => {
-  router.push(`/course/edit/${id}`);
+const editCourse = async (id: number) => {
+  const courseDetail = await fetchCourseDetail(id);
+  if (courseDetail) {
+    // 存储课程详情到localStorage供编辑页面使用
+    localStorage.setItem('editCourseData', JSON.stringify(courseDetail));
+    router.push(`/course/edit/${id}`);
+  }
+};
+
+// 保存课程编辑
+const saveCourseEdit = async (formData: any) => {
+  try {
+    await axios.put(`http://localhost:8080/course/update/${formData.id}`, formData);
+    ElMessage.success('课程编辑成功');
+    // 返回课程列表并刷新数据
+    router.push('/course');
+    fetchCourseData();
+    return true;
+  } catch (err) {
+    console.error('保存课程编辑失败:', err);
+    ElMessage.error('保存课程编辑失败');
+    return false;
+  }
 };
 
 // 个人中心
@@ -198,6 +245,13 @@ onMounted(() => {
     router.push('/login');
   }
 });
+
+// 暴露方法供子组件使用
+defineExpose({
+  saveCourseEdit,
+  fetchCourseDetail
+});
+
 </script>
 
 <style scoped>

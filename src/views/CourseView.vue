@@ -195,16 +195,16 @@ const state = reactive({
 const editRules = reactive<FormRules<Course>>({
   id: [
     { required: true, message: "编号不能为空", trigger: "blur" },
-    { type: "number", message: "编号必须为数字", trigger: "blur" },
+    { type: "number", message: "编号必须为数字", trigger: "blur", transform:(value)=> Number(value) },
   ],
   title: [{ required: true, message: "课程名称不能为空", trigger: "blur" }],
   price: [
     { required: true, message: "价格不能为空", trigger: "blur" },
-    { type: "number", min: 0, message: "价格必须大于等于0", trigger: "blur" }
+    { type: "number", min: 0, message: "价格必须大于等于0", trigger: "blur", transform:(value)=> Number(value)}
   ],
   duration: [
     { required: true, message: "时长不能为空", trigger: "blur" },
-    { type: "number", min: 1, message: "时长必须大于0", trigger: "blur" }
+    { type: "number", min: 1, message: "时长必须大于0", trigger: "blur", transform:(value)=> Number(value) }
   ],
   level: [{ required: true, message: "请选择难度", trigger: "blur" }],
   time: [{ required: true, message: "请选择创建时间", trigger: "blur" }],
@@ -215,11 +215,11 @@ const addRules = reactive<FormRules<Course>>({
   title: [{ required: true, message: "课程名称不能为空", trigger: "blur" }],
   price: [
     { required: true, message: "价格不能为空", trigger: "blur" },
-    { type: "number", min: 0, message: "价格必须大于等于0", trigger: "blur" }
+    { type: "number", min: 0, message: "价格必须大于等于0", trigger: "blur", transform:(value)=> Number(value)}
   ],
   duration: [
     { required: true, message: "时长不能为空", trigger: "blur" },
-    { type: "number", min: 1, message: "时长必须大于0", trigger: "blur" }
+    { type: "number", min: 1, message: "时长必须大于0", trigger: "blur" , transform:(value)=> Number(value)}
   ],
   level: [{ required: true, message: "请选择难度", trigger: "blur" }],
   time: [{ required: true, message: "请选择创建时间", trigger: "blur" }],
@@ -274,7 +274,7 @@ const update = async (formEl: FormInstance | undefined) => {
       axios({
         method: "post",
         url: "http://localhost:8080/course/updateCourse",
-        data: state.form,
+        params: state.form,
       }).then((res) => {
         if (res.data.code === 0) {
           state.dialogFormVisible = false;
@@ -296,7 +296,7 @@ const add = async (formEl: FormInstance | undefined) => {
       axios({
         method: "post",
         url: "http://localhost:8080/course/addCourse",
-        data: state.Addform,
+        params: state.Addform,
       }).then((res) => {
         if (res.data.code === 0) {
           state.dialogAddFormVisible = false;
@@ -335,7 +335,7 @@ const handleDelete = (row: Course) => {
     axios({
       method: "post",
       url: "http://localhost:8080/course/delCourse",
-      params: { id: row.id },
+      params: { courseId: row.id },
     }).then((res) => {
       if (res.data.code === 0) {
         ElMessage.success("删除成功");

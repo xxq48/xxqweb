@@ -75,44 +75,44 @@ const initBarChart = () => {
   const chartInstance: ECharts = echarts.init(barChart.value);
   
   const option = {
-    tooltip: {
-      trigger: 'axis',
-      formatter: '{b}: {c} 次浏览'
-    },
-    grid: {
-      left: '3%',
-      right: '4%',
-      bottom: '15%',
-      containLabel: true
-    },
-    xAxis: {
-      type: 'category',
-      data: statisticsData.map(item => item.title),
-      axisLabel: {
-        rotate: 45,
-        interval: 0,
-        fontSize: 12
+  tooltip: {
+    trigger: 'axis' as const,  // 添加 as const 断言
+    formatter: '{b}: {c} 次浏览'
+  },
+  grid: {
+    left: '3%',
+    right: '4%',
+    bottom: '15%',
+    containLabel: true
+  },
+  xAxis: {
+    type: 'category' as const,  // 添加 as const 断言
+    data: statisticsData.map(item => item.title),
+    axisLabel: {
+      rotate: 45,
+      interval: 0,
+      fontSize: 12
+    }
+  },
+  yAxis: {
+    type: 'value' as const,  // 添加 as const 断言
+    name: '浏览量'
+  },
+  series: [
+    {
+      data: statisticsData.map(item => item.viewCount),
+      type: 'bar' as const,  // 添加 as const 断言
+      itemStyle: {
+        color: '#409eff'
+      },
+      label: {
+        show: true,
+        position: 'top',
+        formatter: '{c}'
       }
-    },
-    yAxis: {
-      type: 'value',
-      name: '浏览量'
-    },
-    series: [
-      {
-        data: statisticsData.map(item => item.viewCount),
-        type: 'bar',
-        itemStyle: {
-          color: '#409eff'
-        },
-        label: {
-          show: true,
-          position: 'top',
-          formatter: '{c}'
-        }
-      }
-    ]
-  };
+    }
+  ]
+};
   
   chartInstance.setOption(option);
   
@@ -135,45 +135,45 @@ const initLineChart = () => {
   const chartInstance: ECharts = echarts.init(lineChart.value);
   
   const option = {
-    tooltip: {
-      trigger: 'item',
-      formatter: '{b}: {c} 次浏览'
-    },
-    grid: {
-      left: '3%',
-      right: '4%',
-      bottom: '3%',
-      containLabel: true
-    },
-    xAxis: {
-      type: 'category',
-      data: statisticsData.map(item => `新闻${item.id}`),
-      name: '新闻编号'
-    },
-    yAxis: {
-      type: 'value',
-      name: '浏览量'
-    },
-    series: [
-      {
-        data: statisticsData.map(item => item.viewCount),
-        type: 'line',
-        smooth: true,
-        symbol: 'circle',
-        symbolSize: 8,
-        lineStyle: {
-          width: 3
-        },
-        itemStyle: {
-          color: '#67c23a'
-        },
-        label: {
-          show: true,
-          position: 'top'
-        }
+  tooltip: {
+    trigger: 'item' as const,  // 添加 as const 断言
+    formatter: '{b}: {c} 次浏览'
+  },
+  grid: {
+    left: '3%',
+    right: '4%',
+    bottom: '3%',
+    containLabel: true
+  },
+  xAxis: {
+    type: 'category' as const,  // 添加 as const 断言
+    data: statisticsData.map(item => `新闻${item.id}`),
+    name: '新闻编号'
+  },
+  yAxis: {
+    type: 'value' as const,  // 添加 as const 断言
+    name: '浏览量'
+  },
+  series: [
+    {
+      data: statisticsData.map(item => item.viewCount),
+      type: 'line' as const,  // 添加 as const 断言
+      smooth: true,
+      symbol: 'circle',
+      symbolSize: 8,
+      lineStyle: {
+        width: 3
+      },
+      itemStyle: {
+        color: '#67c23a'
+      },
+      label: {
+        show: true,
+        position: 'top'
       }
-    ]
-  };
+    }
+  ]
+};
   
   chartInstance.setOption(option);
   

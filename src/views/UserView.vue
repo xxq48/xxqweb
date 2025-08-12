@@ -12,7 +12,7 @@
     <el-table-column prop="name" label="用户名" width="120" />
     <el-table-column prop="email" label="邮箱" width="200" />
     <el-table-column prop="phone" label="手机号" width="150" />
-    <el-table-column prop="role" label="角色" width="150" />
+    <el-table-column prop="roleName" label="角色" width="150" />
     <el-table-column prop="time" label="创建时间" width="200" />
     <el-table-column fixed="right" label="操作" min-width="120">
       <template #default="scope">
@@ -54,12 +54,12 @@
         <el-input v-model="state.form.phone" autocomplete="off" />
       </el-form-item>
       <el-form-item label="角色" :label-width="state.formLabelWidth" prop="role">
-        <el-select v-model="state.form.role" placeholder="请选择角色">
-          <el-option label="超级管理员" value="ROLE_SUPER_ADMIN" />
-          <el-option label="内容运营" value="ROLE_CONTENT_OP" />
-          <el-option label="留学顾问" value="ROLE_CONSULTANT" />
-          <el-option label="教师" value="ROLE_TEACHER" />
-          <el-option label="普通用户" value="ROLE_USER" />
+        <el-select v-model="state.form.roleId" placeholder="请选择角色">
+          <el-option label="超级管理员" :value="1" />
+          <el-option label="内容运营" :value="2" />
+          <el-option label="留学顾问" :value="3" />
+          <el-option label="教师" :value="4" />
+          <el-option label="普通用户" :value="5" />
         </el-select>
       </el-form-item>
       <el-form-item label="创建时间" :label-width="state.formLabelWidth" prop="suCreateTime">
@@ -96,12 +96,12 @@
         <el-input v-model="state.Addform.phone" autocomplete="off" />
       </el-form-item>
       <el-form-item label="角色" :label-width="state.formLabelWidth" prop="role">
-        <el-select v-model="state.Addform.role" placeholder="请选择角色">
-          <el-option label="超级管理员" value="ROLE_SUPER_ADMIN" />
-          <el-option label="内容运营" value="ROLE_CONTENT_OP" />
-          <el-option label="留学顾问" value="ROLE_CONSULTANT" />
-          <el-option label="教师" value="ROLE_TEACHER" />
-          <el-option label="普通用户" value="ROLE_USER" />
+        <el-select v-model="state.Addform.roleId" placeholder="请选择角色">
+          <el-option label="超级管理员" value="1" />
+          <el-option label="内容运营" value="2" />
+          <el-option label="留学顾问" value="3" />
+          <el-option label="教师" value="4" />
+          <el-option label="普通用户" value="5" />
         </el-select>
       </el-form-item>
       <el-form-item label="创建时间" :label-width="state.formLabelWidth" prop="suCreateTime">
@@ -146,7 +146,7 @@ interface User {
   pwd: string;
   email: string;
   phone: string;
-  role: string;
+  roleId: number;
   createTime: string;
 }
 
@@ -168,7 +168,7 @@ const state = reactive({
     name: "",
     email: "",
     phone: "",
-    role: "",
+    roleId: 0,
     createTime: "",
   } as User,
   Addform: {
@@ -176,7 +176,7 @@ const state = reactive({
     pwd: "",
     email: "",
     phone: "",
-    role: "",
+    roleId: 0,
     createTime: "",
   } as User,
 });
@@ -196,7 +196,7 @@ const editRules = reactive<FormRules<User>>({
     { required: true, message: "手机号不能为空", trigger: "blur" },
     { pattern: /^1[3-9]\d{9}$/, message: "请输入正确的手机号格式", trigger: "blur" }
   ],
-  role: [{ required: true, message: "请选择角色", trigger: "blur" }],
+  roleId: [{ required: true, message: "请选择角色", trigger: "blur" }],
   createTime: [{ required: true, message: "请选择创建时间", trigger: "blur" }],
 });
 
@@ -215,7 +215,7 @@ const addRules = reactive<FormRules<User>>({
     { required: true, message: "手机号不能为空", trigger: "blur" },
     { pattern: /^1[3-9]\d{9}$/, message: "请输入正确的手机号格式", trigger: "blur" }
   ],
-  role: [{ required: true, message: "请选择角色", trigger: "blur" }],
+  roleId: [{ required: true, message: "请选择角色", trigger: "blur" }],
   createTime: [{ required: true, message: "请选择创建时间", trigger: "blur" }],
 });
 
@@ -279,7 +279,7 @@ const update = async (formEl: FormInstance | undefined) => {
       axios({
         method: "post",
         url: "http://localhost:8080/sysUser/updateUser",
-        data: state.form,
+        params: state.form,
       }).then((res) => {
         if (res.data.code === 0) {
           state.dialogFormVisible = false;
@@ -314,7 +314,7 @@ const add = async (formEl: FormInstance | undefined) => {
       axios({
         method: "post",
         url: "http://localhost:8080/sysUser/addUser",
-        data: state.Addform,
+        params: state.Addform,
       }).then((res) => {
         if (res.data.code === 0) {
           state.dialogAddFormVisible = false;
@@ -339,7 +339,7 @@ const handleAdd = () => {
     pwd: "",
     email: "",
     phone: "",
-    role: "",
+    roleId: 0,
     createTime: ""
   };
 };

@@ -1,276 +1,327 @@
 <template>
-  <div class="role-management">
-    <h1>角色管理</h1>
-    
-    <!-- 操作按钮区 -->
-    <div class="action-buttons">
-      <el-button type="primary" @click="handleAdd">新增角色</el-button>
-    </div>
-    
-    <!-- 角色表格 -->
-    <el-table 
-      :data="roles" 
-      border 
-      style="width: 100%; margin-top: 20px;"
-    >
-      <el-table-column 
-        prop="id" 
-        label="ID" 
-        width="80"
-        align="center"
-      ></el-table-column>
-      <el-table-column 
-        prop="name" 
-        label="角色名称" 
-        width="180"
-        align="center"
-      ></el-table-column>
-      <el-table-column 
-        prop="code" 
-        label="角色编码" 
-        width="200"
-        align="center"
-      ></el-table-column>
-      <el-table-column 
-        prop="description" 
-        label="权限描述" 
-        align="center"
-      ></el-table-column>
-      <el-table-column 
-        prop="createTime" 
-        label="创建时间" 
-        width="200"
-        align="center"
-      ></el-table-column>
-      <el-table-column 
-        label="操作" 
-        width="200"
-        align="center"
-      >
-        <template #default="scope">
-          <el-button 
-            type="success" 
-            size="small" 
-            @click="handleEdit(scope.row)"
-          >
-            编辑
-          </el-button>
-          <el-button 
-            type="danger" 
-            size="small" 
-            @click="handleDelete(scope.row)"
-            style="margin-left: 10px;"
-          >
-            删除
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    
-    <!-- 新增/编辑角色弹窗 -->
-    <el-dialog 
-      :title="dialogTitle" 
-      v-model="dialogVisible" 
-      width="500px"
-    >
-      <el-form 
-        :model="form" 
-        ref="roleForm" 
-        :rules="rules" 
-        label-width="100px"
-      >
-        <el-form-item label="角色名称" prop="name">
-          <el-input v-model="form.name"></el-input>
-        </el-form-item>
-        <el-form-item label="角色编码" prop="code">
-          <el-input v-model="form.code"></el-input>
-        </el-form-item>
-        <el-form-item label="权限描述" prop="description">
-          <el-input 
-            v-model="form.description" 
-            type="textarea" 
-            rows="4"
-          ></el-input>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleSubmit">确定</el-button>
+  <el-breadcrumb :separator-icon="ArrowRight" style="margin-bottom: 10px;">
+    <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+    <el-breadcrumb-item>系统管理</el-breadcrumb-item>
+    <el-breadcrumb-item>角色管理</el-breadcrumb-item>
+  </el-breadcrumb>
+  
+  <el-button type="primary" :icon="Plus" @click="handleAdd">新增</el-button>
+  
+  <el-table :data="state.tableData" border stripe style="width: 100%; margin-top: 20px;">
+    <el-table-column fixed prop="roleId" label="编号" width="100" />
+    <el-table-column prop="name" label="角色名称" width="150" />
+    <!-- <el-table-column prop="roleCode" label="角色编码" width="200" /> -->
+    <el-table-column prop="description" label="权限描述" width="300" />
+    <el-table-column prop="time" label="创建时间" width="200" />
+    <el-table-column fixed="right" label="操作" min-width="120">
+      <template #default="scope">
+        <el-button link type="primary" size="small" @click="handleDelete(scope.row)">
+          删除
+        </el-button>
+        <el-button
+          link
+          type="primary"
+          size="small"
+          @click="handleEdit(scope.$index, scope.row)"
+        >编辑</el-button>
       </template>
-    </el-dialog>
+    </el-table-column>
+  </el-table>
+  
+  <el-pagination
+    background
+    layout="prev, pager, next"
+    :total="state.total"
+    :page-size="state.pageSize"
+    @current-change="refreshData"
+    style="margin-top: 20px; text-align: right;"
+  />
+  
+  <!-- 编辑窗口 -->
+  <el-dialog v-model="state.dialogFormVisible" title="修改角色信息" width="500">
+    <el-form :model="state.form" ref="editFormRef" :rules="editRules">
+      <el-form-item label="编号" :label-width="state.formLabelWidth" prop="roleId">
+        <el-input v-model="state.form.roleId" autocomplete="off" readonly />
+      </el-form-item>
+      <el-form-item label="角色名称" :label-width="state.formLabelWidth" prop="name">
+        <el-input v-model="state.form.name" autocomplete="off" />
+      </el-form-item>
+      <!-- <el-form-item label="角色编码" :label-width="state.formLabelWidth" prop="roleCode">
+        <el-input v-model="state.form.roleCode" autocomplete="off" />
+      </el-form-item> -->
+      <el-form-item label="权限描述" :label-width="state.formLabelWidth" prop="description">
+        <el-input v-model="state.form.description" autocomplete="off" type="textarea" rows=3 />
+      </el-form-item>
+      <el-form-item label="创建时间" :label-width="state.formLabelWidth" prop="time">
+        <el-date-picker
+          v-model="state.form.time"
+          type="datetime"
+          value-format="YYYY-MM-DD HH:mm:ss"
+          placeholder="请选择日期时间"
+          style="width: 100%"
+        />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="state.dialogFormVisible = false">取消</el-button>
+        <el-button type="primary" @click="update(editFormRef)">确认</el-button>
+      </div>
+    </template>
+  </el-dialog>
+  
+  <!-- 新增窗口 -->
+  <el-dialog v-model="state.dialogAddFormVisible" title="新增角色信息" width="500">
+    <el-form :model="state.Addform" ref="addFormRef" :rules="addRules">
+      <el-form-item label="角色名称" :label-width="state.formLabelWidth" prop="name">
+        <el-input v-model="state.Addform.name" autocomplete="off" />
+      </el-form-item>
+      <!-- <el-form-item label="角色编码" :label-width="state.formLabelWidth" prop="roleCode">
+        <el-input v-model="state.Addform.roleCode" autocomplete="off" />
+      </el-form-item> -->
+      <el-form-item label="权限描述" :label-width="state.formLabelWidth" prop="description">
+        <el-input v-model="state.Addform.description" autocomplete="off" type="textarea" rows=3 />
+      </el-form-item>
+      <el-form-item label="创建时间" :label-width="state.formLabelWidth" prop="time">
+        <el-date-picker
+          v-model="state.Addform.time"
+          type="datetime"
+          value-format="YYYY-MM-DD HH:mm:ss"
+          placeholder="请选择日期时间"
+          style="width: 100%"
+        />
+      </el-form-item>
+    </el-form>
     
-    <!-- 删除确认弹窗 -->
-    <el-dialog 
-      title="确认删除" 
-      v-model="deleteDialogVisible" 
-      width="30%"
-    >
-      <p>确定要删除角色 <span style="color: red">{{ deleteRoleName }}</span> 吗？</p>
-      <template #footer>
-        <el-button @click="deleteDialogVisible = false">取消</el-button>
-        <el-button type="danger" @click="confirmDelete">确定</el-button>
-      </template>
-    </el-dialog>
-  </div>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="state.dialogAddFormVisible = false">取消</el-button>
+        <el-button type="primary" @click="add(addFormRef)">确认</el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
-<script>
-export default {
-  name: 'RoleManagement',
-  data() {
-    return {
-      // 角色列表数据
-      roles: [
-        {
-          id: '1',
-          name: '超级管理员',
-          code: 'ROLE_SUPER_ADMIN',
-          description: '系统所有权限，含用户 / 角色配置',
-          createTime: '2023-01-12 10:00:00'
-        },
-        {
-          id: '2',
-          name: '内容运营',
-          code: 'ROLE_CONTENT_OP',
-          description: '资讯 / 课程内容发布、编辑权限',
-          createTime: '2023-01-12 10:00:00'
-        },
-        {
-          id: '3',
-          name: '留学顾问',
-          code: 'ROLE_CONSULTANT',
-          description: '咨询回复、学生规划权限',
-          createTime: '2023-01-12 10:00:00'
-        },
-        {
-          id: '4',
-          name: '教师',
-          code: 'ROLE_TEACHER',
-          description: '课程资料管理、学员答疑权限',
-          createTime: '2023-01-12 10:00:00'
-        },
-        {
-          id: '5',
-          name: '普通用户',
-          code: 'ROLE_USER',
-          description: '浏览内容、提交咨询基础权限',
-          createTime: '2023-01-12 10:00:00'
-        }
-      ],
-      
-      // 弹窗相关
-      dialogVisible: false,
-      dialogTitle: '',
-      deleteDialogVisible: false,
-      deleteRoleName: '',
-      currentRole: null,
-      
-      // 表单数据
-      form: {
-        id: '',
-        name: '',
-        code: '',
-        description: '',
-        createTime: ''
-      },
-      
-      // 表单验证规则
-      rules: {
-        name: [
-          { required: true, message: '请输入角色名称', trigger: 'blur' },
-          { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
-        ],
-        code: [
-          { required: true, message: '请输入角色编码', trigger: 'blur' },
-          { pattern: /^[A-Z_]+$/, message: '请使用大写字母和下划线', trigger: 'blur' }
-        ],
-        description: [
-          { required: true, message: '请输入权限描述', trigger: 'blur' },
-          { min: 5, message: '描述至少 5 个字符', trigger: 'blur' }
-        ]
-      }
+<script lang="ts" setup>
+import { reactive, onMounted, ref } from "vue";
+import { ElMessage, ElMessageBox } from "element-plus";
+import axios, { AxiosError } from "axios";
+import type { FormInstance, FormRules } from "element-plus";
+import { Plus, ArrowRight } from "@element-plus/icons-vue";
+
+// 定义角色数据类型接口
+interface Role {
+  roleId: string | number;
+  name: string;
+  roleCode: string;
+  description: string;
+  time: string;
+}
+
+// 定义表单引用
+const editFormRef = ref<FormInstance>();
+const addFormRef = ref<FormInstance>();
+
+// 定义页面状态
+const state = reactive({
+  dialogFormVisible: false,
+  dialogAddFormVisible: false,
+  formLabelWidth: "140px",
+  tableData: [] as Role[],
+  pageNum: 1,
+  pageSize: 5,
+  total: 0,
+  form: {
+    roleId: "",
+    name: "",
+    roleCode: "",
+    description: "",
+    time: "",
+  } as Role,
+  Addform: {
+    roleId: "",
+    name: "",
+    roleCode: "",
+    description: "",
+    time: "",
+  } as Role,
+});
+
+// 编辑表单验证规则
+const editRules = reactive<FormRules<Role>>({
+  roleId: [
+    { required: true, message: "编号不能为空", trigger: "blur" },
+    { type: "number", message: "编号必须为数字", trigger: "blur" },
+  ],
+  name: [{ required: true, message: "角色名称不能为空", trigger: "blur" }],
+  // roleCode: [
+  //   { required: true, message: "角色编码不能为空", trigger: "blur" },
+  //   { pattern: /^ROLE_/, message: "角色编码必须以ROLE_开头", trigger: "blur" }
+  // ],
+  description: [{ required: true, message: "权限描述不能为空", trigger: "blur" }],
+  time: [{ required: true, message: "请选择创建时间", trigger: "blur" }],
+});
+
+// 新增表单验证规则
+const addRules = reactive<FormRules<Role>>({
+  name: [{ required: true, message: "角色名称不能为空", trigger: "blur" }],
+  // roleCode: [
+  //   { required: true, message: "角色编码不能为空", trigger: "blur" },
+  //   { pattern: /^ROLE_/, message: "角色编码必须以ROLE_开头", trigger: "blur" }
+  // ],
+  description: [{ required: true, message: "权限描述不能为空", trigger: "blur" }],
+  time: [{ required: true, message: "请选择创建时间", trigger: "blur" }],
+});
+
+// 获取后台角色数据
+const getData = () => {
+  axios({
+    method: "get",
+    url: "http://localhost:8080/sysRole/pageRole",
+    params: { pageNum: state.pageNum, pageSize: state.pageSize }
+  }).then((res) => {
+    if (res.data.code === 0) {
+      state.tableData = res.data.data;
+      state.total = res.data.count;
+    } else {
+      ElMessage.error("加载失败：" + res.data.msg);
+      state.tableData = [];
     }
-  },
-  methods: {
-    // 新增角色
-    handleAdd() {
-      this.dialogTitle = '新增角色';
-      this.currentRole = null;
-      // 重置表单
-      this.form = {
-        id: '',
-        name: '',
-        code: '',
-        description: '',
-        createTime: ''
-      };
-      this.dialogVisible = true;
-    },
-    
-    // 编辑角色
-    handleEdit(row) {
-      this.dialogTitle = '编辑角色';
-      this.currentRole = row;
-      // 复制数据到表单
-      this.form = { ...row };
-      this.dialogVisible = true;
-    },
-    
-    // 删除角色
-    handleDelete(row) {
-      this.deleteRoleName = row.name;
-      this.currentRole = row;
-      this.deleteDialogVisible = true;
-    },
-    
-    // 确认删除
-    confirmDelete() {
-      if (this.currentRole) {
-        this.roles = this.roles.filter(role => role.id !== this.currentRole.id);
-        this.$message.success('角色删除成功');
+  }).catch((err: unknown) => {
+    const error = err as Error | AxiosError;
+    ElMessage.error("接口请求失败：" + (error.message || '未知错误'));
+  });
+};
+
+// 刷新数据
+const refreshData = (page: number) => {
+  state.pageNum = page;
+  getData();
+};
+
+// 显示编辑窗口
+const handleEdit = (index: number, row: Role) => {
+  state.dialogFormVisible = true;
+  // 深拷贝避免双向绑定问题
+  state.form = JSON.parse(JSON.stringify(row));
+};
+
+// 更新角色
+const update = async (formEl: FormInstance | undefined) => {
+  if (!formEl) return;
+  await formEl.validate((valid) => {
+    if (valid) {
+      // 模拟本地更新
+      const index = state.tableData.findIndex(item => item.roleId === state.form.roleId);
+      if (index !== -1) {
+        state.tableData[index] = { ...state.form };
+        ElMessage.success("修改成功");
       }
-      this.deleteDialogVisible = false;
-      this.currentRole = null;
-    },
-    
-    // 提交表单
-    handleSubmit() {
-      this.$refs.roleForm.validate((valid) => {
-        if (valid) {
-          if (this.currentRole) {
-            // 编辑操作
-            const index = this.roles.findIndex(role => role.id === this.currentRole.id);
-            if (index !== -1) {
-              this.roles[index] = { ...this.form };
-              this.$message.success('角色编辑成功');
-            }
-          } else {
-            // 新增操作
-            const newId = (parseInt(this.roles[this.roles.length - 1].id) + 1).toString();
-            const newRole = {
-              ...this.form,
-              id: newId,
-              createTime: new Date().toLocaleString()
-            };
-            this.roles.push(newRole);
-            this.$message.success('角色新增成功');
-          }
-          this.dialogVisible = false;
+      
+      // 接口请求
+      axios({
+        method: "post",
+        url: "http://localhost:8080/sysRole/updateRole",
+        data: state.form,
+      }).then((res) => {
+        if (res.data.code === 0) {
+          state.dialogFormVisible = false;
+          getData();
+          ElMessage.success("修改成功");
+        } else {
+          ElMessage.error(res.data.msg);
         }
+      }).catch((err: unknown) => {
+        const error = err as Error | AxiosError;
+        ElMessage.error("修改失败：" + (error.message || '未知错误'));
       });
     }
-  }
-}
+  });
+};
+
+// 新增角色
+const add = async (formEl: FormInstance | undefined) => {
+  if (!formEl) return;
+  await formEl.validate(async (valid) => {
+    if (valid) {
+      try {
+        const res = await axios({
+          method: "post",
+          url: "http://localhost:8080/sysRole/addRole",
+          data: state.Addform,
+        });
+        if (res.data.code === 0) {
+          const newRole = { ...state.Addform, roleId: res.data.data.roleId };
+          state.tableData.unshift(newRole);
+          state.total++;
+          state.dialogAddFormVisible = false;
+          ElMessage.success("新增成功");
+          getData();
+        } else {
+          ElMessage.error(res.data.msg);
+        }
+      } catch (err: unknown) {
+        const error = err as Error | AxiosError;
+        ElMessage.error("新增失败：" + (error.message || '未知错误'));
+      }
+    }
+  });
+};
+
+// 显示新增窗口
+const handleAdd = () => {
+  state.dialogAddFormVisible = true;
+  // 重置表单
+  state.Addform = {
+    roleId: 0,
+    name: "",
+    roleCode: "",
+    description: "",
+    time: ""
+  };
+};
+
+// 删除角色
+const handleDelete = (row: Role) => {
+  ElMessageBox.confirm("确定删除该角色吗？", "提示", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning",
+  }).then(() => {
+    // 模拟本地删除
+    state.tableData = state.tableData.filter(item => item.roleId !== row.roleId);
+    state.total--;
+    ElMessage.success("删除成功");
+    
+    // 接口请求
+    axios({
+      method: "post",
+      url: "http://localhost:8080/sysRole/delRole",
+      data: { id: row.roleId },
+    }).then((res) => {
+      if (res.data.code === 0) {
+        ElMessage.success("删除成功");
+        getData();
+      } else {
+        ElMessage.error(res.data.msg);
+      }
+    }).catch((err: unknown) => {
+      const error = err as Error | AxiosError;
+      ElMessage.error("删除失败：" + (error.message || '未知错误'));
+    });
+  });
+};
+
+// 页面初始化
+onMounted(() => {
+  getData();
+});
 </script>
 
 <style scoped>
-.role-management {
-  padding: 20px;
-  background-color: #fff;
-  min-height: calc(100vh - 40px);
-}
-
-.action-buttons {
-  margin-top: 10px;
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
 </style>

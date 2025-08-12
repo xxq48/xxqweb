@@ -223,20 +223,20 @@ const addRules = reactive<FormRules<Teacher>>({
 // 获取教师数据
 const getData = () => {
   // 实际项目中使用接口请求
-  // axios({
-  //   method: "get",
-  //   url: "http://localhost:8080/teacher/pageTeacher",
-  //   params: { pageNum: state.pageNum, pageSize: state.pageSize }
-  // }).then((res) => {
-  //   if (res.data.code === 0) {
-  //     state.tableData = res.data.data;
-  //     state.total = res.data.count;
-  //   } else {
-  //     ElMessage.error("加载失败：" + res.data.msg);
-  //   }
-  // }).catch((err) => {
-  //   ElMessage.error("接口请求失败：" + err.message);
-  // });
+  axios({
+    method: "get",
+    url: "http://localhost:8080/teacher/pageTeacher",
+    params: { pageNum: state.pageNum, pageSize: state.pageSize }
+  }).then((res) => {
+    if (res.data.code === 0) {
+      state.tableData = res.data.data;
+      state.total = res.data.count;
+    } else {
+      ElMessage.error("加载失败：" + res.data.msg);
+    }
+  }).catch((err) => {
+    ElMessage.error("接口请求失败：" + err.message);
+  });
 
   // 模拟教师数据（基于teacher.txt）
   const mockData = [
@@ -318,19 +318,19 @@ const update = async (formEl: FormInstance | undefined) => {
         ElMessage.success("修改成功");
       }
 
-      // axios({
-      //   method: "post",
-      //   url: "http://localhost:8080/teacher/updateTeacher",
-      //   data: state.form,
-      // }).then((res) => {
-      //   if (res.data.code === 0) {
-      //     state.dialogFormVisible = false;
-      //     getData();
-      //     ElMessage.success("修改成功");
-      //   } else {
-      //     ElMessage.error(res.data.msg);
-      //   }
-      // });
+      axios({
+        method: "post",
+        url: "http://localhost:8080/teacher/updateTeacher",
+        data: state.form,
+      }).then((res) => {
+        if (res.data.code === 0) {
+          state.dialogFormVisible = false;
+          getData();
+          ElMessage.success("修改成功");
+        } else {
+          ElMessage.error(res.data.msg);
+        }
+      });
     }
   });
 };
@@ -351,19 +351,19 @@ const add = async (formEl: FormInstance | undefined) => {
       state.dialogAddFormVisible = false;
       ElMessage.success("新增成功");
 
-      // axios({
-      //   method: "post",
-      //   url: "http://localhost:8080/teacher/addTeacher",
-      //   data: state.Addform,
-      // }).then((res) => {
-      //   if (res.data.code === 0) {
-      //     state.dialogAddFormVisible = false;
-      //     getData();
-      //     ElMessage.success("新增成功");
-      //   } else {
-      //     ElMessage.error(res.data.msg);
-      //   }
-      // });
+      axios({
+        method: "post",
+        url: "http://localhost:8080/teacher/addTeacher",
+        data: state.Addform,
+      }).then((res) => {
+        if (res.data.code === 0) {
+          state.dialogAddFormVisible = false;
+          getData();
+          ElMessage.success("新增成功");
+        } else {
+          ElMessage.error(res.data.msg);
+        }
+      });
     }
   });
 };

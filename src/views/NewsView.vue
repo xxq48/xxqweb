@@ -11,7 +11,6 @@
     <el-table-column fixed prop="id" label="编号" width="80" />
     <el-table-column prop="title" label="标题" width="200" />
     <el-table-column prop="author" label="作者" width="100" />
-    <el-table-column prop="viewCount" label="阅读量" width="100" />
     <el-table-column 
       prop="status" 
       label="状态" 

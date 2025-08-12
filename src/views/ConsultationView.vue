@@ -13,7 +13,6 @@
     <el-table-column prop="phone" label="联系电话" width="150" />
     <el-table-column prop="email" label="邮箱" width="200" />
     <el-table-column prop="content" label="咨询内容" width="300" />
-    <el-table-column prop="handlerId" label="处理人ID" width="100" />
     <el-table-column prop="reply" label="回复内容" width="300" />
     <el-table-column prop="createTime" label="咨询时间" width="200" />
     <el-table-column prop="replyTime" label="回复时间" width="200" />
@@ -58,10 +57,7 @@
       </el-form-item>
       <el-form-item label="咨询内容" :label-width="state.formLabelWidth" prop="content">
         <el-input v-model="state.form.content" type="textarea" rows="3" autocomplete="off" />
-      </el-form-item>
-      <el-form-item label="处理人ID" :label-width="state.formLabelWidth" prop="handlerId">
-        <el-input v-model="state.form.handlerId" autocomplete="off" />
-      </el-form-item>
+      </el-form-item>  
       <el-form-item label="回复内容" :label-width="state.formLabelWidth" prop="reply">
         <el-input v-model="state.form.reply" type="textarea" rows="3" autocomplete="off" />
       </el-form-item>
@@ -106,9 +102,6 @@
       </el-form-item>
       <el-form-item label="咨询内容" :label-width="state.formLabelWidth" prop="content">
         <el-input v-model="state.Addform.content" type="textarea" rows="3" autocomplete="off" />
-      </el-form-item>
-      <el-form-item label="处理人ID" :label-width="state.formLabelWidth" prop="handlerId">
-        <el-input v-model="state.Addform.handlerId" autocomplete="off" />
       </el-form-item>
       <el-form-item label="回复内容" :label-width="state.formLabelWidth" prop="reply">
         <el-input v-model="state.Addform.reply" type="textarea" rows="3" autocomplete="off" />
@@ -220,20 +213,20 @@ const addRules = reactive<FormRules<Consultation>>({
 // 获取咨询数据
 const getData = () => {
   // 实际项目中使用接口请求
-  // axios({
-  //   method: "get",
-  //   url: "http://localhost:8080/consultation/pageConsultation",
-  //   params: { pageNum: state.pageNum, pageSize: state.pageSize }
-  // }).then((res) => {
-  //   if (res.data.code === 0) {
-  //     state.tableData = res.data.data;
-  //     state.total = res.data.count;
-  //   } else {
-  //     ElMessage.error("加载失败：" + res.data.msg);
-  //   }
-  // }).catch((err) => {
-  //   ElMessage.error("接口请求失败：" + err.message);
-  // });
+  axios({
+    method: "get",
+    url: "http://localhost:8080/consultation/pageConsultation",
+    params: { pageNum: state.pageNum, pageSize: state.pageSize }
+  }).then((res) => {
+    if (res.data.code === 0) {
+      state.tableData = res.data.data;
+      state.total = res.data.count;
+    } else {
+      ElMessage.error("加载失败：" + res.data.msg);
+    }
+  }).catch((err) => {
+    ElMessage.error("接口请求失败：" + err.message);
+  });
 
   // 模拟咨询数据（基于consultation.txt）
   const mockData = [
@@ -243,7 +236,6 @@ const getData = () => {
       phone: "13725964587",
       email: "li_stu@highschool.com",
       content: "高一学生，目前 GPA 3.7，想申请美国 TOP20 本科，需要从哪些方面准备？",
-      handlerId: "2",
       reply: "已为您定制 3 年规划方案（邮件发送），包含托福 / SAT 备考时间线",
       createTime: "2024-07-15 09:30:00",
       replyTime: "2024-07-15 11:20:00"
@@ -254,7 +246,6 @@ const getData = () => {
       phone: "12578953641",
       email: "chen_parent@work.com",
       content: "孩子雅思模考 5.5 分，目标 6.5 分，请问报班后有一对一辅导吗？",
-      handlerId: "2",
       reply: "有的，6.5 分班含 4 次 1 对 1 薄弱项辅导，已电话沟通细节",
       createTime: "2024-07-11 09:20:00",
       replyTime: "2024-07-11 09:20:00"
@@ -265,7 +256,6 @@ const getData = () => {
       phone: "13788889999",
       email: "liu_stu@college.com",
       content: "国内高二，成绩中等，想申请澳洲八大，是否需要高考成绩？",
-      handlerId: "2",
       reply: "澳洲八大可凭高中成绩申请，无需高考，已发送院校名单",
       createTime: "2024-07-05 11:30:00",
       replyTime: "2024-07-05 14:15:00"
@@ -276,14 +266,13 @@ const getData = () => {
       phone: "13699990000",
       email: "zhang_p@company.com",
       content: "孩子托福基础差，词汇量不足 2000，报基础班能跟上吗？",
-      handlerId: "1",
       reply: "待吴老师回复",
       createTime: "2024-07-01 14:20:00",
       replyTime: "2024-07-02 10:45:00"
     }
   ];
-  state.tableData = mockData;
-  state.total = mockData.length;
+  // state.tableData = mockData;
+  // state.total = mockData.length;
 };
 
 // 刷新数据
@@ -310,19 +299,19 @@ const update = async (formEl: FormInstance | undefined) => {
         state.dialogFormVisible = false;
         ElMessage.success("修改成功");
       }
-      // axios({
-      //   method: "post",
-      //   url: "http://localhost:8080/consultation/updateConsultation",
-      //   data: state.form,
-      // }).then((res) => {
-      //   if (res.data.code === 0) {
-      //     state.dialogFormVisible = false;
-      //     getData();
-      //     ElMessage.success("修改成功");
-      //   } else {
-      //     ElMessage.error(res.data.msg);
-      //   }
-      // });
+      axios({
+        method: "post",
+        url: "http://localhost:8080/consultation/updateConsultation",
+        params: state.form,
+      }).then((res) => {
+        if (res.data.code === 0) {
+          state.dialogFormVisible = false;
+          getData();
+          ElMessage.success("修改成功");
+        } else {
+          ElMessage.error(res.data.msg);
+        }
+      });
     }
   });
 };
@@ -342,19 +331,19 @@ const add = async (formEl: FormInstance | undefined) => {
       state.total++;
       state.dialogAddFormVisible = false;
       ElMessage.success("新增成功");
-      // axios({
-      //   method: "post",
-      //   url: "http://localhost:8080/consultation/addConsultation",
-      //   data: state.Addform,
-      // }).then((res) => {
-      //   if (res.data.code === 0) {
-      //     state.dialogAddFormVisible = false;
-      //     getData();
-      //     ElMessage.success("新增成功");
-      //   } else {
-      //     ElMessage.error(res.data.msg);
-      //   }
-      // });
+      axios({
+        method: "post",
+        url: "http://localhost:8080/consultation/addConsultation",
+        params: state.Addform,
+      }).then((res) => {
+        if (res.data.code === 0) {
+          state.dialogAddFormVisible = false;
+          getData();
+          ElMessage.success("新增成功");
+        } else {
+          ElMessage.error(res.data.msg);
+        }
+      });
     }
   });
 };
@@ -384,21 +373,21 @@ const handleDelete = (row: Consultation) => {
     type: "warning",
   }).then(() => {
     // 实际项目中替换为接口请求
-    state.tableData = state.tableData.filter(item => item.id !== row.id);
-    state.total--;
-    ElMessage.success("删除成功");
-    // axios({
-    //   method: "post",
-    //   url: "http://localhost:8080/consultation/delConsultation",
-    //   params: { id: row.id },
-    // }).then((res) => {
-    //   if (res.data.code === 0) {
-    //     ElMessage.success("删除成功");
-    //     getData();
-    //   } else {
-    //     ElMessage.error(res.data.msg);
-    //   }
-    // });
+    // state.tableData = state.tableData.filter(item => item.id !== row.id);
+    // state.total--;
+    // ElMessage.success("删除成功");
+    axios({
+      method: "post",
+      url: "http://localhost:8080/consultation/delConsultation",
+      params: { id: row.id },
+    }).then((res) => {
+      if (res.data.code === 0) {
+        ElMessage.success("删除成功");
+        getData();
+      } else {
+        ElMessage.error(res.data.msg);
+      }
+    });
   });
 };
 
