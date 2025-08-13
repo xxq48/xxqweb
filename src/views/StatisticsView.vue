@@ -43,10 +43,12 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, onUnmounted} from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { ArrowRight } from "@element-plus/icons-vue";
 import * as echarts from "echarts";
 import type { ECharts } from "echarts";
+import axios from "axios";
+import { ElMessage } from "element-plus";
 
 // 定义统计数据类型
 interface StatisticsItem {
@@ -54,65 +56,84 @@ interface StatisticsItem {
   title: string;
   viewCount: number;
   viewRank: number;
+  createTime: string; // 添加 createTime 用于趋势排序
 }
 
-// 从statistics.txt解析的数据
-const statisticsData: StatisticsItem[] = [
-  { id: "1", title: "2025 美国本科申请截止日期汇总", viewCount: 2156, viewRank: 1 },
-  { id: "2", title: "雅思口语 9-12 月新题预测", viewCount: 1892, viewRank: 2 },
-  { id: "3", title: "澳洲留学签证政策 2024 更新", viewCount: 1568, viewRank: 3 },
-  { id: "4", title: "托福家考认可度提升！这些院校接受", viewCount: 1325, viewRank: 4 }
-];
+// 统计数据
+const statisticsData = ref<StatisticsItem[]>([]);
 
 // 图表引用
 const barChart = ref<HTMLDivElement | null>(null);
 const lineChart = ref<HTMLDivElement | null>(null);
 
-// 初始化柱状图
+// 获取新闻数据
+const getData = async () => {
+  try {
+    const res = await axios.get("http://localhost:8080/news/pageNews", {
+      params: { pageNum: 1, pageSize: 100 } // 获取足够数据，假设新闻不多
+    });
+    if (res.data.code === 0) {
+      let data = res.data.data;
+      // 按 viewCount 降序排序，并添加排名
+      data.sort((a: any, b: any) => b.viewCount - a.viewCount);
+      data.forEach((item: any, index: number) => {
+        item.viewRank = index + 1;
+      });
+      statisticsData.value = data;
+    } else {
+      ElMessage.error("加载失败：" + res.data.msg);
+      statisticsData.value = [];
+    }
+  } catch (err) {
+    ElMessage.error("接口请求失败：" + (err as Error).message);
+  }
+};
+
+// 初始化柱状图（浏览量对比，使用按 viewCount 排序的数据）
 const initBarChart = () => {
-  if (!barChart.value) return;
+  if (!barChart.value || statisticsData.value.length === 0) return;
   
   const chartInstance: ECharts = echarts.init(barChart.value);
   
   const option = {
-  tooltip: {
-    trigger: 'axis' as const,  // 添加 as const 断言
-    formatter: '{b}: {c} 次浏览'
-  },
-  grid: {
-    left: '3%',
-    right: '4%',
-    bottom: '15%',
-    containLabel: true
-  },
-  xAxis: {
-    type: 'category' as const,  // 添加 as const 断言
-    data: statisticsData.map(item => item.title),
-    axisLabel: {
-      rotate: 45,
-      interval: 0,
-      fontSize: 12
-    }
-  },
-  yAxis: {
-    type: 'value' as const,  // 添加 as const 断言
-    name: '浏览量'
-  },
-  series: [
-    {
-      data: statisticsData.map(item => item.viewCount),
-      type: 'bar' as const,  // 添加 as const 断言
-      itemStyle: {
-        color: '#409eff'
-      },
-      label: {
-        show: true,
-        position: 'top',
-        formatter: '{c}'
+    tooltip: {
+      trigger: 'axis' as const,
+      formatter: '{b}: {c} 次浏览'
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '15%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'category' as const,
+      data: statisticsData.value.map(item => item.title),
+      axisLabel: {
+        rotate: 45,
+        interval: 0,
+        fontSize: 12
       }
-    }
-  ]
-};
+    },
+    yAxis: {
+      type: 'value' as const,
+      name: '浏览量'
+    },
+    series: [
+      {
+        data: statisticsData.value.map(item => item.viewCount),
+        type: 'bar' as const,
+        itemStyle: {
+          color: '#409eff'
+        },
+        label: {
+          show: true,
+          position: 'top',
+          formatter: '{c}'
+        }
+      }
+    ]
+  };
   
   chartInstance.setOption(option);
   
@@ -128,52 +149,57 @@ const initBarChart = () => {
   });
 };
 
-// 初始化折线图
+// 初始化折线图（浏览量趋势，按 createTime 排序）
 const initLineChart = () => {
-  if (!lineChart.value) return;
+  if (!lineChart.value || statisticsData.value.length === 0) return;
+  
+  // 按 createTime 升序排序以展示趋势
+  const sortedByTime = [...statisticsData.value].sort((a, b) => 
+    new Date(a.createTime).getTime() - new Date(b.createTime).getTime()
+  );
   
   const chartInstance: ECharts = echarts.init(lineChart.value);
   
   const option = {
-  tooltip: {
-    trigger: 'item' as const,  // 添加 as const 断言
-    formatter: '{b}: {c} 次浏览'
-  },
-  grid: {
-    left: '3%',
-    right: '4%',
-    bottom: '3%',
-    containLabel: true
-  },
-  xAxis: {
-    type: 'category' as const,  // 添加 as const 断言
-    data: statisticsData.map(item => `新闻${item.id}`),
-    name: '新闻编号'
-  },
-  yAxis: {
-    type: 'value' as const,  // 添加 as const 断言
-    name: '浏览量'
-  },
-  series: [
-    {
-      data: statisticsData.map(item => item.viewCount),
-      type: 'line' as const,  // 添加 as const 断言
-      smooth: true,
-      symbol: 'circle',
-      symbolSize: 8,
-      lineStyle: {
-        width: 3
-      },
-      itemStyle: {
-        color: '#67c23a'
-      },
-      label: {
-        show: true,
-        position: 'top'
+    tooltip: {
+      trigger: 'item' as const,
+      formatter: '{b}: {c} 次浏览'
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'category' as const,
+      data: sortedByTime.map(item => item.title || `新闻${item.id}`), // 使用标题或编号
+      name: '新闻'
+    },
+    yAxis: {
+      type: 'value' as const,
+      name: '浏览量'
+    },
+    series: [
+      {
+        data: sortedByTime.map(item => item.viewCount),
+        type: 'line' as const,
+        smooth: true,
+        symbol: 'circle',
+        symbolSize: 8,
+        lineStyle: {
+          width: 3
+        },
+        itemStyle: {
+          color: '#67c23a'
+        },
+        label: {
+          show: true,
+          position: 'top'
+        }
       }
-    }
-  ]
-};
+    ]
+  };
   
   chartInstance.setOption(option);
   
@@ -189,8 +215,9 @@ const initLineChart = () => {
   });
 };
 
-// 页面挂载时初始化图表
-onMounted(() => {
+// 页面挂载时获取数据并初始化图表
+onMounted(async () => {
+  await getData();
   initBarChart();
   initLineChart();
 });

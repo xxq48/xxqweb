@@ -8,7 +8,7 @@
       <!-- 企业Logo和标题 -->
       <div class="login-header">
         <div class="logo">
-          <el-icon class="logo-icon"><Globe /></el-icon>
+          <el-icon class="logo-icon"><ChatDotRound /></el-icon>
           <span class="logo-text">GlobalEdu</span>
         </div>
         <h2 class="login-title">管理员登录</h2>
@@ -94,18 +94,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, getCurrentInstance } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
-import {
-  ChatDotRound,
-  Refresh,
-  User,
-  Lock,
-  Key,
-} from "@element-plus/icons-vue";
+import { ChatDotRound, Refresh, User, Lock, Key, Compass } from "@element-plus/icons-vue"; 
 import axios from "axios";
-import { lo } from "element-plus/es/locales.mjs";
 
 // 登录表单数据
 const loginForm = ref({

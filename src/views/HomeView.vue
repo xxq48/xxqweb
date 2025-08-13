@@ -1,3 +1,4 @@
+```vue
 <template>
   <el-container class="layout-container-demo" style="height: 100vh">
     <el-aside width="200px">
@@ -22,9 +23,9 @@
           
           <!-- 课程管理模块 -->
           <el-sub-menu index="3">
-  <template #title>
-    <el-icon><Reading /></el-icon>课程管理 
-  </template>
+            <template #title>
+              <el-icon><Reading /></el-icon>课程管理 
+            </template>
             <el-menu-item index="course"><el-icon><Document /></el-icon>课程列表</el-menu-item>
             <el-menu-item index="teacher"><el-icon><UserFilled /></el-icon>教师管理</el-menu-item>
           </el-sub-menu>
@@ -32,10 +33,10 @@
           <!-- 资讯管理模块 -->
           <el-sub-menu index="4">
             <template #title>
-  <el-icon><MessageBox /></el-icon>资讯管理
-</template>
+              <el-icon><MessageBox /></el-icon>资讯管理
+            </template>
             <el-menu-item index="news"><el-icon><Reading /></el-icon>资讯列表</el-menu-item>
-           <el-menu-item index="statistics"><el-icon><Histogram/></el-icon>浏览统计</el-menu-item>
+            <el-menu-item index="statistics"><el-icon><Histogram/></el-icon>浏览统计</el-menu-item>
           </el-sub-menu>
         </el-menu>
       </el-scrollbar>
@@ -73,12 +74,18 @@
                 </div>
               </template>
               
-              <el-table :data="state.courseData" border style="width: 100%">
+              <el-table 
+                :data="state.courseData" 
+                border 
+                style="width: 100%" 
+                :header-cell-style="{ textAlign: 'center' }" 
+                :cell-style="{ textAlign: 'center' }"
+              >
                 <el-table-column prop="id" label="课程ID" width="80" />
                 <el-table-column prop="title" label="课程名称" width="200" />
-              <el-table-column prop="price" label="价格" width="100">
-  <template #default="scope">{{ formatPrice(scope.row.price) }}</template>
-</el-table-column>
+                <el-table-column prop="price" label="价格" width="100">
+                  <template #default="scope">{{ formatPrice(scope.row.price) }}</template>
+                </el-table-column>
                 <el-table-column prop="duration" label="时长(月)" width="100" />
                 <el-table-column prop="level" label="难度级别" width="120">
                   <template #default="scope">
@@ -89,11 +96,11 @@
                     </el-tag>
                   </template>
                 </el-table-column>
-                <el-table-column prop="time" label="创建时间" width="160" />
+                <!-- <el-table-column prop="createTime" label="创建时间" width="160" /> -->
                 <el-table-column label="操作" width="180">
+                  <!-- eslint-disable-next-line vue/no-unused-vars -->
                   <template #default="scope">
-                    <el-button size="small" @click="viewCourseDetail(scope.row.id)">查看详情</el-button>
-                    <el-button size="small" type="primary" @click="editCourse(scope.row.id)">编辑</el-button>
+                    <el-button size="small" type="success" @click="router.push('/course')">查看详情</el-button>
                   </template>
                 </el-table-column>
               </el-table>
@@ -115,7 +122,7 @@ import {
 import { reactive, onMounted } from "vue";
 import { useRouter } from 'vue-router';
 import axios from "axios";
-import { ElMessage,ElLoading } from 'element-plus';
+import { ElMessage, ElLoading } from 'element-plus';
 
 const router = useRouter();
 
@@ -150,11 +157,12 @@ const refreshData = () => {
 const fetchCourseData = () => {
   return axios.get('http://localhost:8080/course/listCourse')
     .then(res => {
-      // 转换价格为数字类型
+      // 转换价格为数字类型，并限制显示前五条
       state.courseData = res.data.map((course: any) => ({
         ...course,
-        price: Number(course.price)
-      }));
+        price: Number(course.price),
+        createTime: course.create_time // 确保字段名与后端一致
+      })).slice(0, 5); // 只取前五条数据
       return state.courseData;
     })
     .catch(err => {
@@ -185,46 +193,9 @@ const fetchCourseDetail = (id: number) => {
     });
 };
 
-// 查看课程详情
-const viewCourseDetail = async (id: number) => {
-  const courseDetail = await fetchCourseDetail(id);
-  if (courseDetail) {
-    router.push({
-      path: `/course/detail/${id}`,
-      query: { course: JSON.stringify(courseDetail) }
-    });
-  }
-};
-
-// 编辑课程
-const editCourse = async (id: number) => {
-  const courseDetail = await fetchCourseDetail(id);
-  if (courseDetail) {
-    // 存储课程详情到localStorage供编辑页面使用
-    localStorage.setItem('editCourseData', JSON.stringify(courseDetail));
-    router.push(`/course/edit/${id}`);
-  }
-};
-
-// 保存课程编辑
-const saveCourseEdit = async (formData: any) => {
-  try {
-    await axios.put(`http://localhost:8080/course/update/${formData.id}`, formData);
-    ElMessage.success('课程编辑成功');
-    // 返回课程列表并刷新数据
-    router.push('/course');
-    fetchCourseData();
-    return true;
-  } catch (err) {
-    console.error('保存课程编辑失败:', err);
-    ElMessage.error('保存课程编辑失败');
-    return false;
-  }
-};
-
 // 个人中心
 const goProfile = () => {
-  router.push('/profile');
+  router.push('/Client');
 };
 
 // 退出登录
@@ -248,7 +219,6 @@ onMounted(() => {
 
 // 暴露方法供子组件使用
 defineExpose({
-  saveCourseEdit,
   fetchCourseDetail
 });
 
@@ -289,5 +259,11 @@ defineExpose({
 
 .el-table {
   margin-top: 15px;
+}
+
+.el-table .el-tag {
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 </style>

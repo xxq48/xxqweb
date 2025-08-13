@@ -10,7 +10,6 @@
   <el-table :data="state.tableData" border stripe style="width: 100%; margin-top: 20px;">
     <el-table-column fixed prop="roleId" label="编号" width="100" />
     <el-table-column prop="name" label="角色名称" width="150" />
-    <!-- <el-table-column prop="roleCode" label="角色编码" width="200" /> -->
     <el-table-column prop="description" label="权限描述" width="300" />
     <el-table-column prop="time" label="创建时间" width="200" />
     <el-table-column fixed="right" label="操作" min-width="120">
@@ -46,9 +45,6 @@
       <el-form-item label="角色名称" :label-width="state.formLabelWidth" prop="name">
         <el-input v-model="state.form.name" autocomplete="off" />
       </el-form-item>
-      <!-- <el-form-item label="角色编码" :label-width="state.formLabelWidth" prop="roleCode">
-        <el-input v-model="state.form.roleCode" autocomplete="off" />
-      </el-form-item> -->
       <el-form-item label="权限描述" :label-width="state.formLabelWidth" prop="description">
         <el-input v-model="state.form.description" autocomplete="off" type="textarea" rows=3 />
       </el-form-item>
@@ -76,9 +72,6 @@
       <el-form-item label="角色名称" :label-width="state.formLabelWidth" prop="name">
         <el-input v-model="state.Addform.name" autocomplete="off" />
       </el-form-item>
-      <!-- <el-form-item label="角色编码" :label-width="state.formLabelWidth" prop="roleCode">
-        <el-input v-model="state.Addform.roleCode" autocomplete="off" />
-      </el-form-item> -->
       <el-form-item label="权限描述" :label-width="state.formLabelWidth" prop="description">
         <el-input v-model="state.Addform.description" autocomplete="off" type="textarea" rows=3 />
       </el-form-item>
@@ -92,7 +85,6 @@
         />
       </el-form-item>
     </el-form>
-    
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="state.dialogAddFormVisible = false">取消</el-button>
@@ -105,7 +97,7 @@
 <script lang="ts" setup>
 import { reactive, onMounted, ref } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import type { FormInstance, FormRules } from "element-plus";
 import { Plus, ArrowRight } from "@element-plus/icons-vue";
 
@@ -113,7 +105,6 @@ import { Plus, ArrowRight } from "@element-plus/icons-vue";
 interface Role {
   roleId: string | number;
   name: string;
-  roleCode: string;
   description: string;
   time: string;
 }
@@ -134,14 +125,12 @@ const state = reactive({
   form: {
     roleId: "",
     name: "",
-    roleCode: "",
     description: "",
     time: "",
   } as Role,
   Addform: {
     roleId: "",
     name: "",
-    roleCode: "",
     description: "",
     time: "",
   } as Role,
@@ -154,10 +143,6 @@ const editRules = reactive<FormRules<Role>>({
     { type: "number", message: "编号必须为数字", trigger: "blur" },
   ],
   name: [{ required: true, message: "角色名称不能为空", trigger: "blur" }],
-  // roleCode: [
-  //   { required: true, message: "角色编码不能为空", trigger: "blur" },
-  //   { pattern: /^ROLE_/, message: "角色编码必须以ROLE_开头", trigger: "blur" }
-  // ],
   description: [{ required: true, message: "权限描述不能为空", trigger: "blur" }],
   time: [{ required: true, message: "请选择创建时间", trigger: "blur" }],
 });
@@ -165,10 +150,6 @@ const editRules = reactive<FormRules<Role>>({
 // 新增表单验证规则
 const addRules = reactive<FormRules<Role>>({
   name: [{ required: true, message: "角色名称不能为空", trigger: "blur" }],
-  // roleCode: [
-  //   { required: true, message: "角色编码不能为空", trigger: "blur" },
-  //   { pattern: /^ROLE_/, message: "角色编码必须以ROLE_开头", trigger: "blur" }
-  // ],
   description: [{ required: true, message: "权限描述不能为空", trigger: "blur" }],
   time: [{ required: true, message: "请选择创建时间", trigger: "blur" }],
 });
@@ -187,9 +168,8 @@ const getData = () => {
       ElMessage.error("加载失败：" + res.data.msg);
       state.tableData = [];
     }
-  }).catch((err: unknown) => {
-    const error = err as Error | AxiosError;
-    ElMessage.error("接口请求失败：" + (error.message || '未知错误'));
+  }).catch((err) => {
+    ElMessage.error("接口请求失败：" + err.message);
   });
 };
 
@@ -211,18 +191,10 @@ const update = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate((valid) => {
     if (valid) {
-      // 模拟本地更新
-      const index = state.tableData.findIndex(item => item.roleId === state.form.roleId);
-      if (index !== -1) {
-        state.tableData[index] = { ...state.form };
-        ElMessage.success("修改成功");
-      }
-      
-      // 接口请求
       axios({
         method: "post",
         url: "http://localhost:8080/sysRole/updateRole",
-        data: state.form,
+        params: state.form,
       }).then((res) => {
         if (res.data.code === 0) {
           state.dialogFormVisible = false;
@@ -231,9 +203,8 @@ const update = async (formEl: FormInstance | undefined) => {
         } else {
           ElMessage.error(res.data.msg);
         }
-      }).catch((err: unknown) => {
-        const error = err as Error | AxiosError;
-        ElMessage.error("修改失败：" + (error.message || '未知错误'));
+      }).catch((err) => {
+        ElMessage.error("修改失败：" + err.message);
       });
     }
   });
@@ -242,28 +213,23 @@ const update = async (formEl: FormInstance | undefined) => {
 // 新增角色
 const add = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
-  await formEl.validate(async (valid) => {
+  await formEl.validate((valid) => {
     if (valid) {
-      try {
-        const res = await axios({
-          method: "post",
-          url: "http://localhost:8080/sysRole/addRole",
-          data: state.Addform,
-        });
+      axios({
+        method: "post",
+        url: "http://localhost:8080/sysRole/addRole",
+        params: state.Addform,
+      }).then((res) => {
         if (res.data.code === 0) {
-          const newRole = { ...state.Addform, roleId: res.data.data.roleId };
-          state.tableData.unshift(newRole);
-          state.total++;
           state.dialogAddFormVisible = false;
-          ElMessage.success("新增成功");
           getData();
+          ElMessage.success("新增成功");
         } else {
           ElMessage.error(res.data.msg);
         }
-      } catch (err: unknown) {
-        const error = err as Error | AxiosError;
-        ElMessage.error("新增失败：" + (error.message || '未知错误'));
-      }
+      }).catch((err) => {
+        ElMessage.error("新增失败：" + err.message);
+      });
     }
   });
 };
@@ -273,9 +239,8 @@ const handleAdd = () => {
   state.dialogAddFormVisible = true;
   // 重置表单
   state.Addform = {
-    roleId: 0,
+    roleId: "",
     name: "",
-    roleCode: "",
     description: "",
     time: ""
   };
@@ -288,16 +253,10 @@ const handleDelete = (row: Role) => {
     cancelButtonText: "取消",
     type: "warning",
   }).then(() => {
-    // 模拟本地删除
-    state.tableData = state.tableData.filter(item => item.roleId !== row.roleId);
-    state.total--;
-    ElMessage.success("删除成功");
-    
-    // 接口请求
     axios({
       method: "post",
       url: "http://localhost:8080/sysRole/delRole",
-      data: { id: row.roleId },
+      params: { roleId: row.roleId },
     }).then((res) => {
       if (res.data.code === 0) {
         ElMessage.success("删除成功");
@@ -305,9 +264,8 @@ const handleDelete = (row: Role) => {
       } else {
         ElMessage.error(res.data.msg);
       }
-    }).catch((err: unknown) => {
-      const error = err as Error | AxiosError;
-      ElMessage.error("删除失败：" + (error.message || '未知错误'));
+    }).catch((err) => {
+      ElMessage.error("删除失败：" + err.message);
     });
   });
 };

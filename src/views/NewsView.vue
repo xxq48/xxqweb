@@ -10,13 +10,10 @@
   <el-table :data="state.tableData" border stripe style="width: 100%; margin-top: 20px;">
     <el-table-column fixed prop="id" label="编号" width="80" />
     <el-table-column prop="title" label="标题" width="200" />
+    <el-table-column prop="content" label="内容" width="250" />
     <el-table-column prop="author" label="作者" width="100" />
-    <el-table-column 
-      prop="status" 
-      label="状态" 
-      width="100"
-      :formatter="formatStatus"
-    />
+    <el-table-column prop="viewCount" label="浏览量" width="100" />
+    <el-table-column prop="status" label="状态"  width="100"  :formatter="formatStatus" />
     <el-table-column prop="createTime" label="创建时间" width="180" />
     <el-table-column fixed="right" label="操作" min-width="120">
       <template #default="scope">
@@ -51,21 +48,22 @@
       <el-form-item label="标题" :label-width="state.formLabelWidth" prop="title">
         <el-input v-model="state.form.title" autocomplete="off" />
       </el-form-item>
-      <el-form-item label="图片路径" :label-width="state.formLabelWidth" prop="image">
-        <el-input v-model="state.form.image" autocomplete="off" />
+      <el-form-item label="图片路径" :label-width="state.formLabelWidth" prop="coverImage">
+        <el-input v-model="state.form.coverImage" autocomplete="off" />
       </el-form-item>
-      <el-form-item label="描述" :label-width="state.formLabelWidth" prop="description">
+      <el-form-item label="内容" :label-width="state.formLabelWidth" prop="content">
         <el-input 
-          v-model="state.form.description" 
+          v-model="state.form.content" 
           autocomplete="off" 
           type="textarea" 
           rows="3"
         />
+        <!-- <el-input v-model.number="state.form.viewCount" autocomplete="off" type="number" /> -->
       </el-form-item>
       <el-form-item label="作者" :label-width="state.formLabelWidth" prop="author">
         <el-input v-model="state.form.author" autocomplete="off" />
       </el-form-item>
-      <el-form-item label="阅读量" :label-width="state.formLabelWidth" prop="viewCount">
+      <el-form-item label="浏览量" :label-width="state.formLabelWidth" prop="viewCount">
         <el-input v-model="state.form.viewCount" autocomplete="off" type="number" />
       </el-form-item>
       <el-form-item label="状态" :label-width="state.formLabelWidth" prop="status">
@@ -98,16 +96,20 @@
       <el-form-item label="标题" :label-width="state.formLabelWidth" prop="title">
         <el-input v-model="state.Addform.title" autocomplete="off" />
       </el-form-item>
-      <el-form-item label="图片路径" :label-width="state.formLabelWidth" prop="image">
-        <el-input v-model="state.Addform.image" autocomplete="off" />
+      <el-form-item label="图片路径" :label-width="state.formLabelWidth" prop="coverImage">
+        <el-input v-model="state.Addform.coverImage" autocomplete="off" />
       </el-form-item>
-      <el-form-item label="描述" :label-width="state.formLabelWidth" prop="description">
+       <el-form-item label="浏览量" :label-width="state.formLabelWidth" prop="viewCount">
+        <el-input v-model="state.Addform.title" autocomplete="off" />
+      </el-form-item>
+      <el-form-item label="内容" :label-width="state.formLabelWidth" prop="content">
         <el-input 
-          v-model="state.Addform.description" 
+          v-model="state.Addform.content" 
           autocomplete="off" 
           type="textarea" 
           rows="3"
         />
+        <!-- <el-input v-model.number="state.Addform.viewCount" autocomplete="off" type="number" /> -->
       </el-form-item>
       <el-form-item label="作者" :label-width="state.formLabelWidth" prop="author">
         <el-input v-model="state.Addform.author" autocomplete="off" />
@@ -157,8 +159,8 @@ const statusMap: { [key: string]: string } = {
 interface News {
   id: string | number;
   title: string;
-  image: string;
-  description: string;
+  coverImage: string;
+  content: string;
   author: string;
   viewCount: number;
   status: string;
@@ -182,8 +184,8 @@ const state = reactive({
   form: {
     id: "",
     title: "",
-    image: "",
-    description: "",
+   coverImage: "",
+    content: "",
     author: "",
     viewCount: 0,
     status: "1",
@@ -193,8 +195,8 @@ const state = reactive({
   Addform: {
     id: "",
     title: "",
-    image: "",
-    description: "",
+   coverImage: "",
+    content: "",
     author: "",
     viewCount: 0,
     status: "1",
@@ -207,15 +209,14 @@ const state = reactive({
 const editRules = reactive<FormRules<News>>({
   id: [
     { required: true, message: "编号不能为空", trigger: "blur" },
-    { type: "number", message: "编号必须为数字", trigger: "blur" }
+    { type: "number", message: "编号必须为数字", trigger: "blur",transform: (value) => Number(value)  }
   ],
   title: [{ required: true, message: "标题不能为空", trigger: "blur" }],
   author: [{ required: true, message: "作者不能为空", trigger: "blur" }],
-  description: [{ required: true, message: "描述不能为空", trigger: "blur" }],
   viewCount: [
-    { required: true, message: "阅读量不能为空", trigger: "blur" },
-    { type: "number", message: "阅读量必须为数字", trigger: "blur" }
-  ],
+  { required: true, message: "阅读量不能为空", trigger: ["blur", "input"] },
+  { type: "number", message: "阅读量必须为数字", trigger: ["blur", "input"],transform: (value) => Number(value) }
+],
   status: [{ required: true, message: "请选择状态", trigger: "blur" }],
   createTime: [{ required: true, message: "请选择创建时间", trigger: "blur" }]
 });
@@ -224,10 +225,9 @@ const editRules = reactive<FormRules<News>>({
 const addRules = reactive<FormRules<News>>({
   title: [{ required: true, message: "标题不能为空", trigger: "blur" }],
   author: [{ required: true, message: "作者不能为空", trigger: "blur" }],
-  description: [{ required: true, message: "描述不能为空", trigger: "blur" }],
   viewCount: [
-    { required: true, message: "阅读量不能为空", trigger: "blur" },
-    { type: "number", message: "阅读量必须为数字", trigger: "blur" }
+    { required: true, message: "浏览量不能为空", trigger: "blur" },
+    { type: "number", message: "浏览量必须为数字", trigger: "blur",transform: (value) => Number(value)  }
   ],
   status: [{ required: true, message: "请选择状态", trigger: "blur" }],
   createTime: [{ required: true, message: "请选择创建时间", trigger: "blur" }]
@@ -266,6 +266,7 @@ const refreshData = (page: number) => {
 // 编辑新闻
 const handleEdit = (index: number, row: News) => {
   state.dialogFormVisible = true;
+  // 深拷贝避免双向绑定问题
   state.form = JSON.parse(JSON.stringify(row));
 };
 
@@ -274,10 +275,19 @@ const update = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate((valid) => {
     if (valid) {
+      // 强制转换为数字
+      state.form.viewCount = Number(state.form.viewCount);
+      // 先更新本地数据
+      const index = state.tableData.findIndex(item => item.id === state.form.id);
+      if (index !== -1) {
+        state.tableData[index] = { ...state.form };
+      }
+      
+      // 再调用接口
       axios({
         method: "post",
         url: "http://localhost:8080/news/updateNews",
-        data: state.form
+        params: state.form,
       }).then((res) => {
         if (res.data.code === 0) {
           state.dialogFormVisible = false;
@@ -296,10 +306,22 @@ const add = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate((valid) => {
     if (valid) {
+      // 强制转换为数字
+      state.Addform.viewCount = Number(state.Addform.viewCount);
+      // 先更新本地数据
+      const newId = (Math.max(...state.tableData.map(item => Number(item.id))) + 1).toString();
+      const newNews = {
+        ...state.Addform,
+        id: newId
+      };
+      state.tableData.unshift(newNews);
+      state.total++;
+      
+      // 再调用接口
       axios({
         method: "post",
         url: "http://localhost:8080/news/addNews",
-        data: state.Addform
+        params: state.Addform,
       }).then((res) => {
         if (res.data.code === 0) {
           state.dialogAddFormVisible = false;
@@ -316,13 +338,14 @@ const add = async (formEl: FormInstance | undefined) => {
 // 打开新增窗口
 const handleAdd = () => {
   state.dialogAddFormVisible = true;
+  // 重置表单
   state.Addform = {
     id: "",
     title: "",
-    image: "",
-    description: "",
+   coverImage: "",
+    content: "",
     author: "",
-   viewCount: 0,
+    viewCount: 0,
     status: "1",
     createTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
     updateTime: ""
@@ -336,10 +359,15 @@ const handleDelete = (row: News) => {
     cancelButtonText: "取消",
     type: "warning",
   }).then(() => {
+    // 先更新本地数据
+    state.tableData = state.tableData.filter(item => item.id !== row.id);
+    state.total--;
+    
+    // 再调用接口
     axios({
       method: "post",
       url: "http://localhost:8080/news/delNews",
-      params: { id: row.id }
+      params: { id: row.id },
     }).then((res) => {
       if (res.data.code === 0) {
         ElMessage.success("删除成功");

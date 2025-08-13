@@ -10,6 +10,7 @@
   <el-table :data="state.tableData" border stripe style="width: 100%; margin-top: 20px;">
     <el-table-column fixed prop="id" label="编号" width="100" />
     <el-table-column prop="title" label="课程名称" width="200" />
+     <el-table-column prop="description" label="课程描述" width="250" />
     <el-table-column prop="price" label="价格" width="120" :formatter="formatPrice" />
     <el-table-column prop="duration" label="时长(月)" width="100" />
     <el-table-column prop="level" label="难度" width="100" :formatter="formatDifficulty" />
