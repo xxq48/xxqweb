@@ -123,7 +123,10 @@
 import { ref } from 'vue';
 import { ElCarousel, ElCarouselItem, ElButton, ElCard, ElIcon, ElTag } from 'element-plus';
 import { Menu } from '@element-plus/icons-vue';
+import { useRouter } from 'vue-router';
 
+
+const router = useRouter(); // 初始化路由实例
 // State for menu visibility
 const menuVisible = ref(false);
 
@@ -256,7 +259,14 @@ const handleConsult = () => {
 };
 
 const handleEnroll = (course: any) => {
-  alert(`您已选择报名：${course.title}。请联系客服以完成注册。`);
+  // 跳转到报名页，并传递课程ID和名称作为参数
+  router.push({
+    path: '/enrollPage', 
+    query: {
+      courseId: course.id,
+      courseName: course.title
+    }
+  });
 };
 
 const handleReadMore = (news: any) => {
@@ -272,9 +282,9 @@ const handleReadMore = (news: any) => {
   overflow-x: hidden;
 }
 
-/* Header */
+/* Header  （表头样式）*/
 .header {
-  background-color: #165DFF;
+  background-color: #3e5283;
   color: white;
   padding: 15px 0;
   position: sticky;
@@ -498,7 +508,7 @@ const handleReadMore = (news: any) => {
 
 /* Footer */
 .footer {
-  background-color: #165DFF;
+  background-color: #3e5283;
   color: white;
   padding: 40px 0;
   text-align: center;

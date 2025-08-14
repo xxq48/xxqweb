@@ -55,12 +55,10 @@ const submitForm = () => {
 .enroll-page {
   padding: 40px 20px;
 }
-
 .page-header {
   text-align: center;
   margin-bottom: 30px;
 }
-
 .enroll-form {
   max-width: 600px;
   margin: 0 auto;
