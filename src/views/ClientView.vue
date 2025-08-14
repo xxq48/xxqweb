@@ -158,38 +158,45 @@ const bannerItems = ref([
 const courses = ref([
   {
     id: 1,
-    title: '雅思强化课程',
-    description: '针对雅思考试的全面培训，帮助学生快速提升听、说、读、写成绩。课程包括模拟考试和个性化反馈。',
-    coverImage: '/image/xxyy.png',
-    level: '中级',
+    title: '美国本科藤校冲刺计划',
+    description: '12 个月全程规划：托福 110+/SAT1500 + 目标，含 8 次文书精修 + 6 次模拟面试',
+    coverImage: '/image/mg.png',
+    level: '进阶',
   },
   {
     id: 2,
-    title: '托福冲刺班',
-    description: '高效备考策略，聚焦高频考点，助力学生高分通过托福考试。包含在线资源和导师指导。',
-    coverImage: '/image/yyks.png',
-    level: '高级',
+    title: '雅思 6.5 分进阶班',
+    description: '36 课时小班课：阅读技巧 + 写作逻辑 + 口语话题库全覆盖，赠送 4 次模考',
+    coverImage: '/image/ys.png',
+    level: '基础',
   },
   {
     id: 3,
-    title: '留学规划咨询',
-    description: '个性化留学方案设计，指导申请世界顶尖大学，包括文书写作和面试准备。',
-    coverImage: '/image/xstl.png',
-    level: '入门',
+    title: '澳洲八大快捷录取项目',
+    description: '针对高二 / 高三学生：免高考申请，含语言班衔接 + 签证全程代办',
+    coverImage: '/image/az.png',
+    level: '基础',
   },
   {
     id: 4,
-    title: '国际文化交流项目',
-    description: '促进中外文化理解，提升全球视野，通过线上线下活动连接国际学生。',
-    coverImage:  '/image/xsjh.png',
-    level: '中级',
+    title: '托福 90 分基础强化班',
+    description: '50 课时：词汇 3000 + 语法体系构建 + 听说读写题型拆解，适合零基础学员',
+    coverImage: '/image/tf.png',
+    level: '入门',
   },
   {
     id: 5,
-    title: 'GRE/GMAT备考课程',
-    description: '针对研究生入学考试的专项训练，涵盖量化、逻辑和写作模块。',
-    coverImage: '/image/sxks.png',
-    level: '高级',
+    title: '英国本科预科衔接课程',
+    description: '学术英语 + 专业基础课程，对接曼大 / 布大等 10 所院校预科项目',
+    coverImage: '/image/ygbk.png',
+    level: '进阶',
+  },
+  {
+    id: 6,
+    title: '英国G5精英冲刺计划',
+    description: '10个月全程规划：雅思7.5+/A-Level A*A*A目标，含6次文书精修+4次牛剑面试辅导',
+    coverImage: '/image/yg.png',
+    level: '进阶',
   },
 ]);
 
@@ -211,7 +218,7 @@ const successCases = ref([
     id: 3,
     title: '学生文化交流项目经历',
     description: '参与国际文化交流后，学生提升了语言能力和跨文化适应力，成功申请加拿大大学。',
-    image: '/image/cpjh.png',
+    image: '/image/hjfy.png',
   },
 ]);
 
@@ -219,15 +226,15 @@ const successCases = ref([
 const newsItems = ref([
   {
     id: 1,
-    title: '2025留学新政解读',
-    summary: '分析最新留学政策变化，包括签证调整和奖学金机会，对留学生的影响详解。',
-    coverImage: '/image/hy.png',
+    title: '2025年美国留学签证政策更新解读',
+    summary: '近日，美国国务院发布了2025年留学签证新政...，对申请流程和材料要求进行了调整。',
+    coverImage:'/image/qz.png',
   },
   {
     id: 2,
-    title: '国际教育展盛大开幕',
-    summary: '2025年教育展在北京举办，汇聚全球顶尖大学，现场咨询留学机会。',
-    coverImage: '/image/gjzl.png',
+    title: '托福家考认可度提升！这些院校接受',
+    summary: '最新清单：哈佛 / 斯坦福等 300 + 院校明确接受托福家考成绩，附报名流程',
+    coverImage: '/image/tfzj.png',
   },
   {
     id: 3,
@@ -237,9 +244,9 @@ const newsItems = ref([
   },
   {
     id: 4,
-    title: '学生成功故事分享会',
-    summary: '邀请多名毕业生分享留学经历，激励更多学生追求国际教育梦想。',
-    coverImage: '/image/hjfy.png',
+    title: '雅思口语 9-12 月新题预测',
+    summary: '独家整理 Part1-Part3 新题库，含 20 个高频话题 + 答题思路解析',
+    coverImage: '/image/sk.png',
   },
 ]);
 
@@ -267,7 +274,7 @@ const handleReadMore = (news: any) => {
 
 /* Header */
 .header {
-  background-color: #5a84e9;
+  background-color: #165DFF;
   color: white;
   padding: 15px 0;
   position: sticky;
@@ -510,7 +517,7 @@ const handleReadMore = (news: any) => {
   transition: color 0.3s;
 }
 .footer-links a:hover {
-  color: #ae7d4f;
+  color: #FF7D00;
 }
 
 /* Responsive Design */
@@ -524,7 +531,7 @@ const handleReadMore = (news: any) => {
     top: 60px;
     left: 0;
     width: 100%;
-    background-color: #2b4c98;
+    background-color: #165DFF;
   }
   .nav-menu.active {
     display: block;

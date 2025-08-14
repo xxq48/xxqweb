@@ -1,6 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 
+import ClientView from '../views/ClientView.vue';
+import EnrollPage from '../views/EnrollPageView.vue';
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -33,6 +36,11 @@ const router = createRouter({
           path: '/course',
           name: 'course',
           component: () => import('../views/CourseView.vue')
+        },
+        {
+          path: '/enrollPage',
+          name: 'enrollPage',
+          component: () => import('../views/EnrollPageView.vue')
         },
         {
           path: '/consultation',
