@@ -15,7 +15,7 @@
               <li><a href="#courses">课程体系</a></li>
               <li><a href="#cases">成功案例</a></li>
               <li><a href="#news">资讯中心</a></li>
-              <li><a href="#contact">联系我们</a></li>
+              <li><a href="javascript:;" @click="openContact">联系我们</a></li>
             </ul>
           </nav>
         </div>
@@ -116,6 +116,31 @@
         </ul>
       </div>
     </footer>
+
+    <!-- 联系咨询弹窗 -->
+<el-dialog 
+  v-model="contactVisible" 
+  title="在线咨询" 
+  width="300px" 
+  :close-on-click-modal="false"
+>
+  <div class="consult-content">
+    <p>Hi~ 您好，我是东西方国际教育李老师，很高兴为您服务</p>
+    <p>如我未及时回复您，留下您的电话，稍后我会在第一时间回复您哦~</p>
+    <p>也可以添加李老师的微信：<strong>17326822421</strong>，随时找我哦~</p>
+    <el-input 
+      v-model="userPhone" 
+      placeholder="请输入您的电话" 
+      class="phone-input"
+      style="margin-top: 15px;"
+    ></el-input>
+  </div>
+  <template #footer>
+    <el-button @click="contactVisible = false">关闭</el-button>
+    <el-button type="primary" @click="submitPhone">发送</el-button>
+  </template>
+</el-dialog>
+
   </div>
 </template>
 
@@ -124,18 +149,38 @@ import { ref } from 'vue';
 import { ElCarousel, ElCarouselItem, ElButton, ElCard, ElIcon, ElTag } from 'element-plus';
 import { Menu } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
-
+import { ElDialog, ElInput, ElMessage } from 'element-plus';
 
 const router = useRouter(); // 初始化路由实例
-// State for menu visibility
+// 响应式数据
 const menuVisible = ref(false);
 
-// Toggle menu for mobile
+// 切换菜单显示状态
 const toggleMenu = () => {
   menuVisible.value = !menuVisible.value;
 };
 
-// Static data for banner
+// 联系弹窗控制
+const contactVisible = ref(false);
+const userPhone = ref('');
+
+// 打开联系弹窗
+const openContact = () => {
+  contactVisible.value = true;
+};
+
+// 提交电话
+const submitPhone = () => {
+  if (!userPhone.value) {
+    ElMessage.warning('请输入您的电话');
+    return;
+  }
+  ElMessage.success('提交成功，老师将尽快联系您！');
+  contactVisible.value = false;
+  userPhone.value = '';
+};
+
+// 横幅数据
 const bannerItems = ref([
   {
     id: 1,
@@ -157,7 +202,7 @@ const bannerItems = ref([
   },
 ]);
 
-// Static data for courses
+// 课程数据
 const courses = ref([
   {
     id: 1,
@@ -203,7 +248,7 @@ const courses = ref([
   },
 ]);
 
-// Static data for success cases
+// 成功案例数据
 const successCases = ref([
   {
     id: 1,
@@ -225,7 +270,7 @@ const successCases = ref([
   },
 ]);
 
-// Static data for news
+// 最新资讯数据
 const newsItems = ref([
   {
     id: 1,
@@ -253,7 +298,7 @@ const newsItems = ref([
   },
 ]);
 
-// Handlers (static, no backend)
+// 处理咨询功能
 const handleConsult = () => {
   alert('咨询功能即将上线！请联系客服：service@iewie.org');
 };
@@ -275,11 +320,20 @@ const handleReadMore = (news: any) => {
 </script>
 
 <style scoped>
-/* Global Styles */
+/* Global Styles （全局样式）*/
 .home-page {
   font-family: 'Roboto', 'Microsoft YaHei', '宋体', sans-serif;
   color: #333;
   overflow-x: hidden;
+}
+
+/* 弹窗样式 */
+.consult-content {
+  line-height: 1.8;
+  font-size: 14px;
+}
+.phone-input {
+  width: 100%;
 }
 
 /* Header  （表头样式）*/
@@ -328,7 +382,7 @@ const handleReadMore = (news: any) => {
   color: #FF7D00;
 }
 
-/* Banner */
+/* 横幅 */
 .banner {
   position: relative;
 }
@@ -396,7 +450,7 @@ const handleReadMore = (news: any) => {
   text-align: center;
 }
 
-/* Courses */
+/* 课程 */
 .courses {
   padding: 60px 0;
   background-color: white;
@@ -438,7 +492,7 @@ const handleReadMore = (news: any) => {
   margin-bottom: 10px;
 }
 
-/* Success Cases */
+/* （成功案例） */
 .cases {
   padding: 60px 0;
   background-color: #f5f5f5;
@@ -506,7 +560,7 @@ const handleReadMore = (news: any) => {
   margin-bottom: 15px;
 }
 
-/* Footer */
+/* 页脚 */
 .footer {
   background-color: #3e5283;
   color: white;
@@ -530,7 +584,7 @@ const handleReadMore = (news: any) => {
   color: #FF7D00;
 }
 
-/* Responsive Design */
+/* 响应式设计 */
 @media (max-width: 768px) {
   .menu-icon {
     display: block;

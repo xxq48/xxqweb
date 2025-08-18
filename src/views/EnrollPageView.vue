@@ -26,19 +26,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps } from 'vue';
+import { ref, defineProps , onMounted} from 'vue';
 import { ElMessage } from 'element-plus';
+import {useRoute} from 'vue-router';
 
-// 接收路由参数
-const props = defineProps<{
-  courseId?: string;
-  courseName?: string;
-}>();
+const route = useRoute();
+
+const courseName = ref<string>(route.query.courseName as string || '');
 
 // 表单数据
 const form = ref({
-  courseId: props.courseId || '',
-  courseName: props.courseName || '',
+  courseId: '',
+  courseName:'',
   name: '',
   phone: '',
   email: ''
@@ -49,6 +48,12 @@ const submitForm = () => {
   // 实际项目中这里会调用API提交数据
   ElMessage.success(`报名成功！我们将尽快与您联系确认${form.value.courseName}的课程详情`);
 };
+
+onMounted(() => {
+  form.value.courseId = route.query.courseId as string;
+  form.value.courseName = route.query.courseName as string;
+});
+
 </script>
 
 <style scoped>

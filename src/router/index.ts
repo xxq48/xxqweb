@@ -7,18 +7,18 @@ import EnrollPage from '../views/EnrollPageView.vue';
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-{
+    {
       path: '/',
       name: 'home',
       component: HomeView,
-      children:[
+      children: [
         {
           path: '/user',
           name: 'user',
           component: () => import('../views/UserView.vue')
         },
         {
-         path: '/teacher',
+          path: '/teacher',
           name: 'teacher',
           component: () => import('../views/TeacherView.vue')
         },
@@ -27,7 +27,7 @@ const router = createRouter({
           name: 'role',
           component: () => import('../views/roleView.vue')
         },
-         {
+        {
           path: '/news',
           name: 'news',
           component: () => import('../views/NewsView.vue')
@@ -37,11 +37,7 @@ const router = createRouter({
           name: 'course',
           component: () => import('../views/CourseView.vue')
         },
-        {
-          path: '/enrollPage',
-          name: 'enrollPage',
-          component: () => import('../views/EnrollPageView.vue')
-        },
+
         {
           path: '/consultation',
           name: 'consultation',
@@ -63,7 +59,12 @@ const router = createRouter({
       path: '/client',
       name: 'client',
       component: () => import('../views/ClientView.vue')
-    }
+    },
+    {
+      path: '/enrollPage',
+      name: 'enrollPage',
+      component: () => import('../views/EnrollPageView.vue')
+    },
   ]
 })
 
